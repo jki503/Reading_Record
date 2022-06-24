@@ -423,5 +423,256 @@ public class PeriodCondtion implements DiscountCondtion{
 ## 명령 쿼리 분리 원칙
 
 </br>
+
+- 루틴 : 어떤 절차를 묶어 호출 가능하도록 이름을 부여한 기능 모듈
+  - 프로시저 : 정해진 절차에 따라 내부의 상태를 변경
+  - 함수 : 어떤 절차에 따라 필요한 값을 계산해서 반환
+
 </br>
+
+> 둘 다 루틴의 종류이고, 부수효과와 반환값의 유무라는 측면에서 명확하게 구분되는 개념  
+> 프로시저는 부수효과를 발생시킬 수 있지만, 값을 반환할 수 없다.  
+> 함수는 값을 반환할 수 있지만 부수효과를 발생 시킬 수 없다.
+
+</br>
+
+- 명령과 쿼리
+  - 명령 : 객체의 상태를 수정하는 오퍼레이션 - 프로시저
+  - 쿼리 : 객체와 관련된 정보를 반환하는 오퍼레이션 - 함수
+
+> 어떠한 오퍼레이션도 `명령인 동시에 쿼리여서는 안된다.`
+
+- 객체의 상태를 변경하는 명령은 반환값을 가질 수 없다.
+- 객체의 정보를 반환하는 쿼리는 상태를 변경할 수 없다.
+
+</br>
+
+### 반복 일정의 명령과 쿼리 분리하기
+
+</br>
+
+- 반복 일정 : 매주 수요일 10시 30분부터 11시까지 회의가 반복되는 일정
+- 이벤트 : 그리고, 위와같이 특정 일자와 시간에 발생하는 사건이 바로 이벤트
+
+</br>
+
+```java
+public class Event {
+    private String subject;
+    private LocalDateTime from;
+    private Duration duration;
+
+    public Event(String subject, LocalDateTime from, Duration duration) {
+        this.subject = subject;
+        this.from = from;
+        this.duration = duration;
+    }
+
+    public boolean isSatisfied(RecurringSchedule schedule) {
+        if (from.getDayOfWeek() != schedule.getDayOfWeek() ||
+                !from.toLocalTime().equals(schedule.getFrom()) ||
+                !duration.equals(schedule.getDuration())) {
+            reschedule(schedule);
+            return false;
+        }
+
+        return true;
+    }
+
+    private void reschedule(RecurringSchedule schedule) {
+        from = LocalDateTime.of(from.toLocalDate().plusDays(daysDistance(schedule)),
+                schedule.getFrom());
+        duration = schedule.getDuration();
+    }
+
+    private long daysDistance(RecurringSchedule schedule) {
+        return schedule.getDayOfWeek().getValue() - from.getDayOfWeek().getValue();
+    }
+}
 ```
+
+> isSatisfied 함수는 반복일정이 만족 되는지 체크하고,  
+> 만족하지 않는 경우 private 메서드로 Event를 schedule로 수정하는 메서드인 rechedule 호출
+
+```java
+public class RecurringSchedule {
+    private String subject;
+    private DayOfWeek dayOfWeek;
+    private LocalTime from;
+    private Duration duration;
+
+    public RecurringSchedule(String subject, DayOfWeek dayOfWeek,
+                             LocalTime from, Duration duration) {
+        this.subject = subject;
+        this.dayOfWeek = dayOfWeek;
+        this.from = from;
+        this.duration = duration;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public LocalTime getFrom() {
+        return from;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+}
+```
+
+</br>
+
+> Recurring Schedule은 반복되는 일정을 정의하기 위한 클래스  
+> 일정의 주제(subject)와 반복될 요일(day), 시작 시간(from), 기간(duration)을 포함
+
+</br>
+
+- 개발자 팀을 당혹시키게 한 버그
+
+</br>
+
+```java
+RecurringSchedule schedule = new RecurringSchedule("회의", DayOfWeek.WEDNESDAY,
+  LocalaTime.of(10,30), Duration.ofMinutes(30));
+
+Event meeting = new Event("회의", LocalTime.of(2019, 5, 9 , 10, 30), Duration.ofMinutes(30));
+
+asssert meeting.isSatisfied(schedule) == false;
+asssert meeting.isSatisfied(schedule) == true;
+```
+
+> 위에서 언급했듯  
+> isSatisfied 조건이 충족되지 않으면  
+> reschedule 메서드를 호출한다. -> `Event의 상태까지 변경!`
+
+</br>
+
+> 즉 위 용어대로 다시 설명하면  
+> isSatisfied는 쿼리 - 함수의 역할만을 요구하지만  
+> 부수효과를 가진 명령 - 프로시저의 역할을 겸하고 있다.
+
+</br>
+
+- 명령과 쿼리 분리하기
+
+```java
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+public class Event {
+    private String subject;
+    private LocalDateTime from;
+    private Duration duration;
+
+    public Event(String subject, LocalDateTime from, Duration duration) {
+        this.subject = subject;
+        this.from = from;
+        this.duration = duration;
+    }
+
+    public boolean isSatisfied(RecurringSchedule schedule) {
+        if (from.getDayOfWeek() != schedule.getDayOfWeek() ||
+                !from.toLocalTime().equals(schedule.getFrom()) ||
+                !duration.equals(schedule.getDuration())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void reschedule(RecurringSchedule schedule) {
+        from = LocalDateTime.of(from.toLocalDate().plusDays(daysDistance(schedule)),
+                schedule.getFrom());
+        duration = schedule.getDuration();
+    }
+
+    private long daysDistance(RecurringSchedule schedule) {
+        return schedule.getDayOfWeek().getValue() - from.getDayOfWeek().getValue();
+    }
+}
+```
+
+> isSatisfied는 순수하게 조건이 맞지 않을 경우 상태만 내보내주고 : 쿼리  
+> rechedule은 from과 duration을 변경하는 부수효과를 가진다 : 명령
+> 이제 클라이언트는 isSatisfied의 결과에 따라 rechedule을 수행할지 말지 판단해야할 것
+
+</br>
+
+### 명령 쿼리 분리와 참조 투명성
+
+- 참조 투명성
+  - 어떤 표현식 e가 있을 때 e의 값으로 e가 나타나는 모든 위치를 교체하더라도 결과가 달라지지 않는 특성
+
+```plain text
+f(1) + f(1) = 6
+f(1) * 2    = 6
+f(1) - 1    = 2
+```
+
+> 위의 f(1)을 3으로 값을 바꾸어도 식의 결과는 변하지 않는다.  
+> 수학의 개념에서 f(1)은 불변이며 부수효과를 가지지 않는 값이기 때문  
+> 위에서 `식의 순서를 변경해도 식의 결과가 보장된다.`
+
+</br>
+
+- 참조 투명성의 장점
+  - 모든 함수를 이미 알고 있는 하나의 결괏값으로 대체할 수 있기 때문에 식을 쉽게 계산
+  - 모든 곳에서 함수 결괏값이 동일하여 식의 순서를 변경하더라도 각 식의 결과는 달리지지 않음
+
+</br>
+
+> 객체지향 프로그래밍은 객체의 상태 변경이라는 부수효과를 기반으로 함으로  
+> 참조 투명성은 예외에 가깝다.  
+> 그래도 그나마 `명령-쿼리 분리 원칙을 사용하여 제한적으로 참조 투명성의 혜택을 누릴 수 있다.`
+
+</br>
+
+- 명령형 프로그래밍 : 부수효과를 기반으로 하는 프로그래밍 방식
+  - 상태를 변경시키는 연산들을 적절한 순서대로 나열함으로싸 프로그램 작성
+- 함수형 프로그래밍 : 부수효과가 존재하지 않는 수학적인 함수에 기반
+  - 참조 투명성 장점 극대화
+  - 명령형 프로그래밍 보다 실행 결과를 이해하고 예측하기 쉬움
+  - `하드웨어의 발달로 병렬처리가 중요해져 인기 상승?`...?
+
+</br>
+
+### 책임에 초점을 맞춰라
+
+</br>
+
+- 디미터 법칙
+
+> 협력이라는 컨텍스트 안에서 객체보다 `메시지를 먼저 결정`하면 두 객체 사이의 구조적인 결합도를 낮출 수 있다.  
+> 수신할 객체를 알지 못한 상태에서 메시지를 먼저 선택함으로써 `객체의 내부 구조에 대해 고민할 필요 X`
+
+</br>
+
+- 묻지 말고 시켜라
+
+> 메시지를 먼저 선택하면 협력을 구조화 하게 한다.  
+> 클라이언트 관점에서 메시지를 선택하기 때문에,  
+> 필요한 정보가 아닌 `원하는 것을 표현한 메시지를 전송하기만 하면 되는 것`
+
+</br>
+
+- 의도를 드러내는 인터페이스
+
+> 메시지를 선택할 때 의도를 드러내는 메시지 이름을 지어라
+
+</br>
+
+- 명령 - 쿼리 분리 원칙
+
+</br>
+
+> 메시지를 선택한다는 것은 어떤일을 하는 것 뿐 아니라  
+> `협력 속에서 객체의 상태를 예측가능하기 위한 방법을 고민`  
+> 따라서, `부수효과를 고민`하여 명령과 쿼리를 분리하여 작성하라
+
+</br>
+
+> 훌륭한 메시지를 얻기 위해서 `객체가 아닌 메시지를 선택해야한다.`  
+> 협력에 적합한 객체보다 협력에 적합한 메시지를 선택할 것
