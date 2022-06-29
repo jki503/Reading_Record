@@ -15,3 +15,5 @@
 ## [07. 객체 분해](./doc/chapter_07.md)
 
 ## [08. 의존성 관리하기](./doc/chapter_08.md)
+
+## [09. 유연한 설계](./doc/chapter_09.md)
