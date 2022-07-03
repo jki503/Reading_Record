@@ -654,3 +654,493 @@ public class RateDiscountableNightlyDiscountPhone extends NightlyDiscountPhone {
 > 이렇게 클래스가 많으면 기능을 수정할때도 수정하는 양이 장난이 이니다.. 또한 버그문제도..
 
 </br>
+
+## 합성 관계로 변경하기
+
+</br>
+
+> 상속 관계는 컴파일타임에 결정되고 고정되기 때문에  
+> 코드를 실행하는 도중에 변경할 수 없다.  
+> 따라서 여러 기능을 조합해야 하는 설계에 상속을 이용하면  
+> 모든 조합 가능한 경우별로 클래스를 추가해야하는 문제가 발생한다.
+
+</br>
+
+> 반면, 합성은 런타임에 정책들의 관계를 고정시킬 필요 없이  
+> 실행 시점에 정책들의 관계를 유연하게 변경할 수 있게 된다.  
+> 상속이 `조합의 결과를 개별 클래스 안으로 밀어넣는 방법`이라면  
+> 합성은 조합을 구성하는 요소들을 개별 클래스로 구현 한 후  
+> `실행 시점에 인스턴스를 조립하는 방법을 사용하는 것`이라고 할 수 있다!
+
+</br>
+
+### 기본 정책 합성하기
+
+</br>
+
+```java
+public interface RatePolicy {
+    Money calculateFee(Phone phone);
+}
+```
+
+> RatePolicy는 기본정책과 부가 정책을 포관하는 인터페이스이다.  
+> Phone을 인자로 받아 계산된 요금을 반환하는  
+> calculateFee 오퍼레이션을 포함하는 간단한 인터페이스다.
+
+</br>
+
+```java
+public abstract class BasicRatePolicy implements RatePolicy {
+    @Override
+    public Money calculateFee(Phone phone) {
+        Money result = Money.ZERO;
+
+        for(Call call : phone.getCalls()) {
+            result.plus(calculateCallFee(call));
+        }
+
+        return result;
+    }
+
+    protected abstract Money calculateCallFee(Call call);
+}
+```
+
+</br>
+
+> 기본 정책을 구성하는 일반 요금제와 심야할인 요금제는  
+> 개별 요금을 계산하는 방식을 제외한 전체 처리 로직이 거의 동일  
+> 이 중복 코드를 담기 위한 추상 클래스가 BasicRatePolicy다.
+
+</br>
+
+- 일반 요금제
+
+```java
+public class RegularPolicy extends BasicRatePolicy {
+    private Money amount;
+    private Duration seconds;
+
+    public RegularPolicy(Money amount, Duration seconds) {
+        this.amount = amount;
+        this.seconds = seconds;
+    }
+
+    @Override
+    protected Money calculateCallFee(Call call) {
+        return amount.times(call.getDuration().getSeconds() / seconds.getSeconds());
+    }
+}
+```
+
+</br>
+
+- 심야 할인 요금제
+
+```java
+public class NightlyDiscountPolicy extends BasicRatePolicy {
+    private static final int LATE_NIGHT_HOUR = 22;
+
+    private Money nightlyAmount;
+    private Money regularAmount;
+    private Duration seconds;
+
+    public NightlyDiscountPolicy(Money nightlyAmount, Money regularAmount, Duration seconds) {
+        this.nightlyAmount = nightlyAmount;
+        this.regularAmount = regularAmount;
+        this.seconds = seconds;
+    }
+
+    @Override
+    protected Money calculateCallFee(Call call) {
+        if (call.getFrom().getHour() >= LATE_NIGHT_HOUR) {
+            return nightlyAmount.times(call.getDuration().getSeconds() / seconds.getSeconds());
+        }
+
+        return regularAmount.times(call.getDuration().getSeconds() / seconds.getSeconds());
+    }
+}
+```
+
+</br>
+
+- 기본 정책(일반 요금제 + 심야할인 요금제)을 이용해 요금을 계산할 Phone
+
+</br>
+
+```java
+public class Phone {
+    private RatePolicy ratePolicy;
+    private List<Call> calls = new ArrayList<>();
+
+    public Phone(RatePolicy ratePolicy) {
+        this.ratePolicy = ratePolicy;
+    }
+
+    public List<Call> getCalls() {
+        return Collections.unmodifiableList(calls);
+    }
+
+    public Money calculateFee() {
+        return ratePolicy.calculateFee(this);
+    }
+}
+```
+
+</br>
+
+> Phone이 인스턴스 변수로 RatePolicy를 가진다.  
+> 폰이 다양한 요금정책과 협력할 수 있어야함으로 요금정책의 타입이  
+> RatePolicy라는 인터페이스로 정의  
+> 또 런타임 의존성 대체를 위해 생성자를 통해  
+> RatePolicy의 인스턴스에 대한 의존성을 주입받는다.
+
+</br>
+
+|                  합성 관계를 사용한 기본 정책의 전체적인 구조                   |
+| :-----------------------------------------------------------------------------: |
+| ![합성 관계를 사용한 기본 정책의 전체적인 구조](../res/_11_interface_phone.png) |
+
+</br>
+
+> Phone처럼 다양한 종류의 객체와 협력하기 위해 합성 관계를 사용하는 경우는  
+> 합성하는 객체의 타입을 인터페이스나 추상클래스로 선언하고  
+> 의존성 주입을 사용해 런타임에 필요한 객체를 설정할 수 있도록 구현하는 것이 일반적이다.
+> 따라서 위 코드는 ratePolicy가 인터페이스의 구현체 타입에 따라 요금 계산하는 방식이 달라진다.
+
+</br>
+
+### 부가 정책 적용하기
+
+</br>
+
+> 부가정책은 기본 정책에 대한 계산이 끝난 후에 적용된다.  
+> 세금 정책을 추가한다면 세금 정책은 RegularPolicy의 계산이 끝나고  
+> Phone에게 반환되기 전에 적용되어야한다.  
+> 따라서 Phone -> TaxablePolicy -> RegularPolicy  
+> 이렇게 인스턴스를 연결해야한다.
+
+</br>
+
+- 기본 요금제에 기본 요금 할인 정책을 적용한 후 세금 정책을 부과한 인스턴스 관계
+
+> Phone -> TaxablePolicy -> RateDiscountablePolicy -> RegularPolicy
+> 요약하면 부가 정책은 RatePolicy 인터페이스를 구현해야 하며,  
+> 내부에 또 다른 RatePolicy 인스턴스를 합성할 수 있어야 한다.
+
+</br>
+
+```java
+public abstract class AdditionalRatePolicy implements RatePolicy {
+    private RatePolicy next;
+
+    public AdditionalRatePolicy(RatePolicy next) {
+        this.next = next;
+    }
+
+    @Override
+    public Money calculateFee(Phone phone) {
+        Money fee = next.calculateFee(phone); // 기본정책 계산 후
+        return afterCalculated(fee) ; // 추후 계산
+    }
+
+    abstract protected Money afterCalculated(Money fee);
+}
+```
+
+</br>
+
+- 세금 정책 구현
+
+```java
+public class TaxablePolicy extends AdditionalRatePolicy {
+    private double taxRatio;
+
+    public TaxablePolicy(double taxRatio, RatePolicy next) {
+        super(next);
+        this.taxRatio = taxRatio;
+    }
+
+    @Override
+    protected Money afterCalculated(Money fee) {
+        return fee.plus(fee.times(taxRatio));
+    }
+}
+```
+
+</br>
+
+- 기본 요금 할인 정책
+
+```java
+public class RateDiscountablePolicy extends AdditionalRatePolicy {
+    private Money discountAmount;
+
+    public RateDiscountablePolicy(Money discountAmount, RatePolicy next) {
+        super(next);
+        this.discountAmount = discountAmount;
+    }
+
+    @Override
+    protected Money afterCalculated(Money fee) {
+        return fee.minus(discountAmount);
+    }
+}
+```
+
+</br>
+
+|             기본 정책과 부가 정책을 조합할 수 있는 상속 구조              |
+| :-----------------------------------------------------------------------: |
+| ![기본 정책과 부가 정책을 조합 할 수 있는 상속 구조](../res/_11_all.jpeg) |
+
+</br>
+
+- 일반 요금제에 세금 정책 조합할 경우
+
+</br>
+
+```java
+Phone phone = new Phone(new TaxablePolicy(0.05, new RegularPolicy(...)))
+```
+
+</br>
+
+> 설계는 복잡해졌지만 상속을 사용한 방식보다 더 유연하고 변경에 강하다.
+
+</br>
+
+### 새로운 정책 추가하기
+
+</br>
+
+|                새로운 부가 정책 추가하기                |
+| :-----------------------------------------------------: |
+| ![새로운 부가 정책 추가하기](../res/_11_addpolicy.jpeg) |
+
+</br>
+
+> 고정 요금제가 필요하다면 고정 요금제를 구현한 클래스 하나만 추가한 후 조합
+
+</br>
+
+|                새로운 부가 정책 추가하기2                |
+| :------------------------------------------------------: |
+| ![새로운 부가 정책 추가하기](../res/_11_addpolicy2.jpeg) |
+
+</br>
+
+> 약정 할인 정책도 클래스 하나만 추가하면 된다.
+
+</br>
+
+> 합성을 이용한 설계를 사용할 경우 우리는 조합에 필요한 클래스들이 아닌  
+> 기능에 대한 클래스 하나만 추가하고 런타임에 필요한 정책들을 조합해서  
+> 원하는 기능을 얻을 수 있다.
+
+</br>
+
+## 믹스인
+
+> 믹스인은 객체를 생성할 때 코드 일부를 클래스 안에 섞어 넣어  
+> 재사용하는 기법을 가리키는 용어이다.  
+> 합성이 런타임에 객체를 조합하는 재사용 방법이라면  
+> 믹스인은 컴파일 타임에 필요한 코드 조각을 조합하는 재사용 방법이다.
+
+</br>
+
+- 믹스인과 상속의 차이
+
+> 상속은 말 그대로 자식 클래스를 부모클래스와 동일 범주의 관계를 만들기 위함  
+> 반면 믹스인은 말 그대로 코드를 다른 코드 안에 섞어넣기 위한 방법  
+> 하지만 상속이 클래스와 클래스 사이의 관계를 고정 시키는데 비해  
+> 믹스인은 유연하게 관계를 재구성 할 수 있다.
+> `믹스인은 합성처럼 유연하면서 상속처럼 쉽게 코드를 재사용 할 수 있다`
+
+</br>
+
+> 믹스인은 Flaovrs 언어에서 처음으로 도입됐고  
+> Flavors의 특징을 흠수한 CLOS에 의해 대중화  
+> 책에서는 스칼라에서 제공하는 트레이트를 이용하여 믹스인 구현
+
+- 트레이트
+
+> 스칼라에서 제공하는 믹스인 기법으로  
+> trait는 super라는 키워드가 부모 클래스 하나를 고정하지 않으며  
+> super 역시 런타임에 달라질 수 있어서  
+> 실제로 trait가 믹스인 되는 시점에 결정된다.
+
+</br>
+
+### 기본 정책 구현하기
+
+</br>
+
+```java
+abstract class BasicRatePolicy {
+  def calculateFee(phone: Phone): Money = phone.calls.map(calculateCallFee(_)).reduce(_ + _)
+
+  protected def calculateCallFee(call: Call): Money;
+}
+```
+
+> 기본 정책을 구현하는 BasicRatePolicy는 기본 정책에 속하는  
+> 전체 요금제 클래스들이 확장할 수 있도록 추상클래스로 구현한다.
+
+```java
+class RegularPolicy(val amount: Money, val seconds: Duration) extends BasicRatePolicy {
+  override protected def calculateCallFee(call: Call): Money = amount * (call.duration.getSeconds / seconds.getSeconds)
+}
+```
+
+> RegularPolicy는 BasicRatePolicy를 상속받아  
+> 개별 Call의 요금을 계산하는  
+> calculateCallFee 메서드를 오버라이딩한다.
+
+</br>
+
+- 심야 요금제도 마찬가지
+
+```java
+class NightlyDiscountPolicy(
+    val nightlyAmount: Money,
+    val regularAmount: Money,
+    val seconds: Duration) extends BasicRatePolicy {
+
+  override protected def calculateCallFee(call: Call): Money =
+    if (call.from.getHour >= NightltDiscountPolicy.LateNightHour) {
+      nightlyAmount * (call.duration.getSeconds / seconds.getSeconds)
+    } else {
+      regularAmount * (call.duration.getSeconds / seconds.getSeconds)
+    }
+}
+
+object NightltDiscountPolicy {
+  val LateNightHour: Integer = 22
+}
+```
+
+</br>
+
+### 트레이트로 부가 정책 구현하기
+
+</br>
+
+```java
+trait TaxablePolicy extends BasicRatePolicy {
+  val taxRate: Double
+  override def calculateFee(phone: Phone): Money = {
+    val fee = super.calculateFee(phone)
+    return fee + fee * taxRate
+  }
+}
+```
+
+> BasicRatePolicy와 다른 코드를 조합하여  
+> TaxablePolicy 구현  
+> 위 코드에서 TabablePolicy 트레이트가 BasicRatePolicy를 확장한다  
+> 상속의 개념이 아니라 TaxablePolicy가 BasicRatePolicy나  
+> 그 자손에 해당하는 경우에만 믹스인 될 수 있다는 것을 의미
+
+</br>
+
+> 상속은 정적이지만 믹스인은 동적이다.  
+> 상속은 컴파일타임에 관계를 고정시키지만  
+> 믹스인은 제약을 둘 뿐 실제로  
+> 어떤 코드에 믹스인 될 지 결정하지 않는다.
+
+</br>
+
+> 또한 super가 가리키는 대상 역시 컴파일 타임이 아닌 실행시점에 결정되어  
+> BasicRatePolicy 타임에 따라 다른 super.calcaulteFee(..)가 실행된다.
+
+</br>
+
+### 부가 정책 트레이트 믹스인 하기
+
+</br>
+
+> 스칼라는 특정 클래스에 믹스인한 클래스와 트레이트를 선형화하여  
+> 어떤 메서드를 호출할지 결정한다.  
+> 클래스의 인스턴스를 생성할 때에는  
+> 클래스 자식과 조상클래스, 트레이트를 일렬로 나열해서 순서를 정한다.  
+> 그 후 실행중인 메서드 내부에서 super 호출을 하면 다음 단계에 위치한  
+> 클래스나 트레이트의 메서드가 호출 된다.
+
+</br>
+
+```java
+class RateDiscountableAndTaxableRegularPolicy(
+  amount: Money,
+  seconds: Duration,
+  val taxRate: Double)
+extends RegularPolicy(amount, seconds)
+with TaxablePolicy
+with RateDiscountablePolicy
+```
+
+</br>
+
+|                 트레이트 선형화                  |
+| :----------------------------------------------: |
+| ![트레이트 선형화](../res/_11_trait_linear.jpeg) |
+
+</br>
+
+> RateDiscountableAndTaxableRegularPolicy가  
+> calculateFee 메시지를 수신한다면  
+> 바로 윗 단계의 RateDiscountablePolicy에 존재하는 지 찾고  
+> 이를 반복하여 선형으로 순차적으로 올라간다.
+
+</br>
+
+```java
+class RateDiscountableAndTaxableRegularPolicy(
+  amount: Money,
+  seconds: Duration,
+  val taxRate: Double)
+extends RegularPolicy(amount, seconds)
+with RateDiscountablePolicy
+with TaxablePolicy
+```
+
+> 반대로 TaxablePolicy와 RateDiscountablePolicy의 순서를 바꾸고 싶다면  
+> 트레이트의 순서를 변경하여 선형화 순서를 바꿀 수 있다.
+
+</br>
+
+> 믹스인을 사용하더라도 클래스 폭발이 남아있는 것인가?  
+> 믹스인을 사용하더라도 상속에서 클래스의 숫자가 기하급수적으로 늘어나는 클래스  
+> 폭발 문제는 여전히 남아있는게 아니냐고 반문할 수 있다.  
+> 클래스 폭발 문제의 단점은 클래스가 늘어난다는 것이 아니라 클래스가 늘어날수록
+> 중복 코드도 함께 기하급수적으로 늘어난다는 점이다.
+> `믹스인은 이런 문제가 발생하지 않는다.`
+
+</br>
+
+### 쌓을 수 잇는 변경
+
+</br>
+
+> 믹스인은 상속 계층 안에서 확장한 클래스보다 더 하위에 위치하게 된다.  
+> 다시 말해 믹스인은 대상 클래스의 자식 클래스처럼 사용될 용도로 만들어 지는 것이다.
+
+</br>
+
+```java
+class RateDiscountableAndTaxableRegularPolicy(
+  amount: Money,
+  seconds: Duration,
+  val taxRate: Double)
+extends RegularPolicy(amount, seconds)
+with RateDiscountablePolicy
+with TaxablePolicy
+```
+
+> 위의 코드 처럼 trait를 믹스인한 with 구문은 항상 extends 구문 뒤에 나온다.  
+> 믹스인을 사용하면 특정한 클래스에 대한 변경 또는 확장을 독립적으로 구현한 후  
+> 필요한 시점에 차례대로 추가할 수 있다.  
+> 믹스인의 이러한 특징을 쌓을 수 있는 변경(stackable modification) 이라고 부른다.
+
+</br>
