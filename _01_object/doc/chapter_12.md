@@ -430,10 +430,296 @@ GradeLecture gradeLecture = (GradeLecture) lecture;
 
 </br>
 
+- 객체 지향 시스템은 다음 규칙에 따라 실행할 메서드를 선택
+  - 메시지를 수신한 객체는 자신을 생성한 클래스에 적합한 메서드가 존재하는지 검사
+  - 메서드를 찾지 못했다면 부모 클래스에서 메서드를 계속 탐색한다.
+  - 상속 계층의 가장 최상위 클래스에 이르렀지만 메서드를 발견하지 못하면 예외를 발생시키면서 탐색 중단
+
+</br>
+
+- self 참조
+
+> 객체가 메시지를 수신하면 컴파일러는 self 참조라는 임시 변수를 자동으로 생성한 후 메시지를 수신한 객체를 가리키도록 한다.  
+> 동적 메서드 탐색은 self가 가리키는 객체의 클래스에서 시작해서 상속 계층의 역방향으로 이뤄지며 메서드 탐색이 종료되는 순간 self 참조는 자동으로 소멸된다.  
+> 시스템은 앞에서 설명한 class포인터와 parent 포인터와 함께 self 참조를 조합해서 메서드를 탐색한다.
+
+</br>
+
+|                  self 참조에서 상속 계층을 따라 이뤄지는 동적 메서드 탐색                   |
+| :-----------------------------------------------------------------------------------------: |
+| ![self 참조에서 상속 계층을 따라 이뤄지는 동적 메서드 탐색](../res/_12_dynamic_method.jpeg) |
+
+</br>
+
+> 메서드 탐색은 자식 -> 부모 방향으로 진행  
+> 따라서 항상 자식 클래스의 메서드가 부모 클래스의 메서드보다 먼저 탐색 된다.
+
+</br>
+
+- `자동적인 메시지 위임` : 자식 클래스는 자신이 이해할 수 없는 메시지를 전송받은 경우 자동으로 상속 계층을 따라 부모 클래스에게 처리를 위임한다.
+- `메서드를 탐색하기 위해 동적인 문맥을 사용` : 메시지를 수신했을 때 실제로 어떤 메서드를 실행할지는 런타임에 이뤄지며 self 참조를 이용하여 결정한다.
+
+</br>
+
+> 메시지가 처리되는 문맥은 컴파일타임이 아닌  
+> 런타임에 실제로 메시지를 수신한 객체가 어떤 타입인지 추적해야한다.  
+> 객체타입에 따라 메서드를 탐색하는 문맥이 동적으로 결정되며  
+> 여기서 중요한 역할을 하는 것이 `self참조이다.`
+
+</br>
+
+### 동적인 문맥
+
+</br>
+
+> self 참조가 동적 문맥을 결정한다는 사실은 종종 어떤 메서드가 실행 될 지를 예상하기 어렵게 만든다.  
+> 대표적인 경우가 자신에게 다시 전달하는 self 전송이다.
+
+```java
+public class Lecture {
+    public String stats() {
+        return String.format("Title: %s, Evaluation Method: %s",
+                title, getEvaluationMethod());
+    }
+
+    public String getEvaluationMethod() {
+        return "Pass or Fail";
+    }
+}
+```
+
+</br>
+
+> 위의 stats() 메서드에서 `자기 자신의 메서드 getEvalutationMethod()`를 호출한다는 표현은 정확하지 않다.  
+> 정확히는 현재 클래스의 메서드를 호출하는 것이 아니라, 현재 객체에게  
+> getEvalutationMethod() 메시지를 전송하는 것이다.
+> `self 참조가 가리키는 객체`, stats 메시지를 수신했던 객체다.
+
+</br>
+
+|             self 전송을 통한 메서드 탐색              |
+| :---------------------------------------------------: |
+| ![self 전송을 통한 메서드 탐색](../res/_12_self.jpeg) |
+
+</br>
+
+> stats() 메서드를 실행하던 도중 getEvalutationMethod를 만나면  
+> self 메시지를 수신한 Lecutre 인스턴스를 가리키토록 할당  
+> 그리고 getEvaluation 메서드를 실행한 후 메서드 탐색 종료
+
+</br>
+
+- 이제 상속이 끼면 이야기가 달라진다.
+
+</br>
+
+```java
+public class GradeLecture extends Lecutre{
+    @Override
+    public String getEvaluationMethod(){
+        return "Grade"
+    }
+}
+```
+
+</br>
+
+> GradeLecture에 stats() 메시지를 전달하면  
+> 메서드 탐색으로 Lecture의 stats()를 발견하고 실행  
+> 그 후 getEvaluationMethod()를 실행하는데  
+> 이때 self 참조고 GradeLecture임으로  
+> GradeLecture 클래스의 getEvaluationMethod가 실행 될 것이다.
+
+</br>
+
+### 잠깐 중간 정리
+
+</br>
+
+- 사실 위에서 발생하는 문제는 사전에 예방할 수 있다.
+
+```java
+public class Parent {
+
+  String name;
+
+  public Parent(String name) {
+    this.name = name;
+  }
+
+  private boolean isParent() {
+    return true;
+  }
+}
+```
+
+|              private method               |
+| :---------------------------------------: |
+| ![private method](../res/_12_private.png) |
+
+</br>
+
+> self 참조로 인한 예측 불가능한 상황을 만들지 않기 위해서  
+> 반드시 오버라이딩의 목적으로 사용할 메서드가 아닌 경우에는  
+> private으로 의도를 막아야한다.
+
+</br>
+
+### 이해할 수 없는 메시지
+
+</br>
+
+- 정적 타입 언어와 이해할 수 없는 메시지
+
+> 정적 타입 언어에서는 코드를 컴파일 할 때 상속 계층 안의  
+> 클래스들이 메시지를 이해할 수 있는지 여부를 판단한다.  
+> 따라서 상속 계층 전체를 탐색한 후에도  
+> 메시지를 처리할 수 있는 메서드를 발견하지 못했다면 컴파일 에러를 발생시킨다.
+
+</br>
+
+- 동적 타입 언어와 이해 할 수 없는 메시지
+
+</br>
+
+> 동적타입언어도 자식 -> 부모 클래스로 메서드를 탐색하지만  
+> 동적 타입 언어는 컴파일 단계가 존재하지 않음으로  
+> 실제 코드를 실행해보기 전에 메시지 처리 가능 여부를 알 수 없다.
+
+</br>
+
+### self 대 super
+
+</br>
+
+> self의 가장 큰 특징은 동적이라는 점이다.  
+> self 참조는 메시지를 수신한 객체의 클래스에 따라 메서드 탐색을 위한 문맥을 실행 시점에 결정한다.
+
+</br>
+
+> 자식 크랠스에서 부모 클래스의 구현을 재사용해야 하는 경우가 있다.  
+> 대부분 객체지향 언어들은 자식 클래스에서 부모 클래스의 인스턴스 변수나  
+> 메서드에 접근하기 위해 사용할 수 있는 super 참조라는 내부 변수 제공한다.
+
+</br>
+
+```java
+public class GradeLecture extends Lecture {
+    @Override
+    public String evaluate() {
+        return super.evaluate() + ", " + gradesStatistics();
+    }
+}
+```
+
+</br>
+
+> 위 코드는 Lecture의 evaluate 메서드 구현을 재사용하기위해  
+> super 참조를 사용해 부모클래스에게 evaluate 메시지를 전송한다.  
+> `호출하는 것이 아니라 전송한다.` 표현한 이유는  
+> 부모 클래스가 아니라 더 상위에 위치한 조상 클래스의 메서드일 수도 있기 때문이다!
+
+</br>
+
+- super 참조의 용도는 부모 클래스에 정의된 메서드를 실행하기 위한 것이 아니다.
+
+</br>
+
+> super 참조의 정확한 의도는  
+> `지금 이 클래스의 부모클래스에서 부터 메서드 탐색을 시작하라`이다.
+
 </br>
 
 ## 상속 대 위임
 
 </br>
+
+### 위임과 self
+
+</br>
+
+> 상속을 이용할 경우 자식 클래스에서 메시지를 처리하지 못하는 경우  
+> 상위 계층으로 메시지를 위임한다. 이때 self 참조는  
+> 메시지를 위임하더라도 현재 메시지를 수신한 객체가 self가 된다.
+
+</br>
+
+|                부모 링크를 가진 객체 사이의 관계로 표현된 상속 관계                 |
+| :---------------------------------------------------------------------------------: |
+| ![부모 링크를 가진 객체 사이의 관계로 표현된 상속 관계](../res/_12_delegation.jpeg) |
+
+</br>
+
+### 프로토타입 기반의 객체지향 언어
+
+</br>
+
+> 클래스가 존재하지 않고 오직 객체만 존재하는 프로토타입 기반의 객체지향 언어에서  
+> 상속을 구현하는 유일한 방법은 객체 사이의 위임을 이용하는 것이다.  
+> 프로토타입 기반 객체지향 언어도 상속을 이용해 self 참조를 통해 자동으로 전달한다.
+
+</br>
+
+```js
+function Lecture(name, scores) {
+  this.name = name;
+  this.scores = scores;
+}
+
+Lecture.prototype.stats = function () {
+  return (
+    "Name: " + this.name + ", Evaludation Method: " + this.getEvaluationMethod()
+  );
+};
+
+Lecture.prototype.getEvaluationMethod = function () {
+  return "Pass or Fail";
+};
+```
+
+> 자바스크립트의 인스턴스는 메시지를 수신하면 먼저 메시지를 수신한 객체의 prototype 안에서 메시지에 응답할 적절한 메서드가 있는지 체크한다.  
+> 메서드가 없다면 prototype이 가리키는 객체를 따라 메시지 처리를 위임한다.  
+> 자바스크립트에서는 prototype 체인으로 연결된 객체 사이에 메시지를 위임함하여 상속을 구현할 수 있다.
+
+</br>
+
+```js
+function GradeLecture(name, canceled, scores) {
+  Lecture.call(this, name, scores);
+  this.canceled = canceled;
+}
+
+GradeLecture.prototype = new Lecture();
+
+GradeLecture.prototype.constructor = GradeLecture;
+
+GradeLecture.prototype.getEvaluationMethod = function () {
+  return "Grade";
+};
+```
+
+> GradeLecture의 prototype에 Lecture의 인스턴스를 할당했다는 것을 주목하라.  
+> 이 과정을 통해 GradeLecutre를 이용해 모든 객체들이 prototype을 통해  
+> Lecture에 정의된 모든 속성과 함수에 접근할 수 있게 된다.  
+> 이제 메시지를 전송하면 prototype으로 연결된 객체 사이의 경로를 통해  
+> 객체 사이의 메서드 탐색이 자동으로 이뤄진다.
+
+</br>
+
+|                   프로토타입 체인을 통해 자동적인 메시지 위임                   |
+| :-----------------------------------------------------------------------------: |
+| ![프로토타입 체인을 통해 자동적인 메시지 위임](../res/_12_prototype_chain.jpeg) |
+
+</br>
+
+```js
+var grade_lecture = new GradeLecture("OOP", false, [1, 2, 3]);
+grade_lecture.stats();
+```
+
+</br>
+
+> js에서는 클래스가 존재하지 않음으로 오직 객체 사이의 메시지 위임만을 사용하여 다형성을 구현한다.  
+> 이것은 객체지향 패러다임에서 클래스가 필수 요소가 아니라는 점을 잘 보여준다
 
 </br>
