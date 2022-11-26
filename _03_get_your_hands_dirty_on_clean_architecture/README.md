@@ -19,6 +19,14 @@ Author: Jung
   - [아키텍처적으로 표현력 있는 패키지 구조](#아키텍처적으로-표현력-있는-패키지-구조)
   - [의존성 주입의 역할](#의존성-주입의-역할)
 - [04. 유스케이스 구현하기](#04-유스케이스-구현하기)
+  - [유스케이스 둘러보기](#유스케이스-둘러보기)
+  - [입력 유효성 검증](#입력-유효성-검증)
+  - [생성자의 힘](#생성자의-힘)
+  - [유스케이스마다 다른 입력 모델](#유스케이스마다-다른-입력-모델)
+  - [비즈니스 규칙 검증하기](#비즈니스-규칙-검증하기)
+  - [풍부한 도메인 모델 vs 빈약한 도메인 모델](#풍부한-도메인-모델-vs-빈약한-도메인-모델)
+  - [읽기 전용 유스케이스는 어떨까?](#읽기-전용-유스케이스는-어떨까)
+  - [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움을 줄까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움을-줄까)
 - [05. 웹 어댑터 구현하기](#05-웹-어댑터-구현하기)
 - [06. 영속성 어댑터 구현하기](#06-영속성-어댑터-구현하기)
 - [07. 아키텍처 요소 테스트 하기](#07-아키텍처-요소-테스트-하기)
@@ -415,6 +423,485 @@ Author: Jung
 ## 04. 유스케이스 구현하기
 
 </br>
+
+### 유스케이스 둘러보기
+
+</br>
+
+> 먼저 유스케이스가 실제로 무슨일을 하는지 살펴보자.  
+> 일반적으로 유스케이스는 다음과 같은 단계를 따른다.
+
+</br>
+
+- 1.  입력을 받는다
+- 2.  비즈니스 규칙을 검증한다.
+- 3.  모델 상태를 조작한다.
+- 4.  출력을 반환한다.
+
+</br>
+
+> 유스케이스는 인커밍 어댑태로부터 입력을 받는다.  
+> 이 단계를 왜 `입력 유효성 검증`으로 부르지 않는지 의아할 수도 있다.  
+> 책에서는 유스케이스 코드가 도메인 로직에만 신경 써야 하고 입력 유효성 검증으로 오염되면 안된다고 말한다.  
+> 그래서 입력 유효성 검증은 곧 살펴볼 다른 곳에서 처리한다.
+>
+> 그러마 유스케이스는 비즈니스 규칙을 검증할 책임이 있다.  
+> 그리고 도메인 엔티티와 이 책임을 공유한다.
+> 책의 후반에서 입력 유효성 검증과 비즈니스 규칙 검증의 차이점에 대해 말한다.
+
+</br>
+
+> 비즈니스 규칙을 충족하면 유스케이스는 입력 기반으로 어떤 방법으로든 모델의 상태를 변경한다.  
+> 일반적으로 도메인 객체의 상태를 바꾸고 영속성 어댑터를 통해 구현된 포트로 이 상태를 전달해서 저장할 수 있게 한다.  
+> 유스케이스는 또 다른 아웃고잉 어댑터를 호출할 수도 있다.
+> 즉,
+
+- 비즈니스 규칙 충족
+- 유스케이스가 입력 기반으로 모델 상태 변경
+- 도메인 객체 상태를 변경 후 영속성 어댑터로 구현된 포트로 상태 저장
+- 마지막 단계에서 아웃고잉 어댑터에서 온 출력 값을, 유스케이스를 호출한 어댑터로 반환할 출력 객체로 변환
+
+</br>
+
+> 이 단계들을 염두에 두고 `송금하기` 유스케이스를 구현해보자
+
+```java
+package buckpal.cleanarchitecture.account.application.service;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyCommand;
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyUseCase;
+import buckpal.cleanarchitecture.account.application.port.out.AccountLock;
+import buckpal.cleanarchitecture.account.application.port.out.LoadAccountPort;
+import buckpal.cleanarchitecture.account.application.port.out.UpdateAccountStatePort;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Transactional
+public class SendMoneyService implements SendMoneyUseCase {
+
+	private final LoadAccountPort loadAccountPort;
+
+	private final AccountLock accountLock;
+
+	private final UpdateAccountStatePort updateAccountStatePort;
+
+	@Override
+	public boolean sendMoney(SendMoneyCommand command) {
+		// TODO : 비즈니스 규칙 검증
+		// TODO : 모델 상태 조작
+		// TODO : 출력값 반환
+
+		return false;
+	}
+}
+```
+
+| 하나의 서비스가 하나의 유스케이스를 구현하고, 도메인 모델을 변경하고 상태를 저장하기 위해 아웃고잉 포트를 호출한다 |
+| :----------------------------------------------------------------------------------------------------------------: |
+|                                       ![_04_usecase](./res/_04_usecase.jpeg)                                       |
+
+</br>
+
+- 서비스는 인커밍 포트 인터페이스인 SendMoneyUseCase를 구현한다.
+- 계좌를 불러오기 위해 아웃고잉 포트 인터페이스인 LoadAccountPort를 호출한다.
+- 그리고 데이터베이스의 계좌 상태를 업데이트 하기 위해 UpdateAccountStatePort를 호출한다.
+
+> 앞의 코드에서 // TODO로 남겨둔 부분을 살펴보자
+
+</br>
+
+### 입력 유효성 검증
+
+</br>
+
+> 호출하는 어댑터가 유스케이스에 입력을 전달하기 전에 입력 유효성을 검증하면 어떨까?  
+> 과연 유스케이스에서 필요로 하는 것을 호출자가 모두 검증했다고 믿을 수 있을까?  
+> 또, 유스케이스는 하나 이상의 어댑터에서 호출될 텐데, 그러면 유효성 검증을 각 어댑터에서 모두 구현해야 한다.  
+> 그럼 그 과정에서 실수할 수도 있고, 유효성 검증을 해야한다는 사실을 잊어버릴 수도 있다.
+>
+> 애플리케이션 계층에서 입력 유효성을 검증해야 하는 이유는  
+> 그렇지 않을 경우 애플리케이션 코어의 바깥쪽으로 부터 유효하지 않은 입력값을 받게 되고, 모델의 상태를 해칠 수 있기 때문이다.
+>
+> 유스케이스 클래스가 아니라면 도대체 어디에서 입력 유효성을 검증해야 할까?
+>
+> 입력 모델이 이 문제를 다루도록 해보자.  
+> `송금 하기` 유스케이스에서 입력 모델은 예제 코드에서 본 SendMoneyCommand 클래스다.  
+> 더 정확히 말하자면 생성자 내에서 입력 유효성을 검증할 것이다.
+
+</br>
+
+```java
+package buckpal.cleanarchitecture.account.application.port.in;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+
+import buckpal.cleanarchitecture.account.domain.Money;
+import lombok.Getter;
+
+@Getter
+public class SendMoneyCommand {
+
+	private final AccountId sourceAccountId;
+
+	private final AccountId targetAccountId;
+
+	private final Money money;
+
+	public SendMoneyCommand(AccountId sourceAccountId,
+		AccountId targetAccountId, Money money) {
+		this.sourceAccountId = sourceAccountId;
+		this.targetAccountId = targetAccountId;
+		this.money = money;
+	}
+}
+```
+
+</br>
+
+> 송금을 위해서는 출금 계좌와 입금 계좌의 ID, 송금할 금액이 필요하다.  
+> 모든 파라미터가 null이 되어서는 안되고, 송금액은 0보다 커야 한다.  
+> 이러한 조건 중 하나라도 위배되면 객체를 생성할 때 예외를 던져서 객체 생성을 막으면 된다.
+>
+> SendMoneyCommand의 필드에 final을 지정해 불변 필드로 만들었다.  
+> 일단 생성에 성공하고 나면 상태는 유효하고 이후에 잘못된 상태로 변경할 수 없다는 사실을 보장할 수 있다.
+>
+> SendMoneyCommand는 유스케이스 API의 일부이기 때문에 인커밍 포트 패키지에 위치한다.  
+> 그러므로 유효성 검증이 애플리케이션의 코어에 남아있지만 유스케이스 코드를 오염시키지 않는다.
+>
+> 그런데 이런 귀찮은 작업들을 대신해 줄 수 있는 도구가 이미 있는데  
+> 굳이 모든 유효성 검증을 직접 구현해야할까?  
+> 자바 세계에서는 Bean Validation API가 이러한 작업을 위한 사실상의 표준 라이브러리다.  
+> 이 API를 이용하면 필요한 유효성 규칙들을 필드의 애너테이션으로 표현할 수 있다.
+
+</br>
+
+- SelfValidating 구현
+
+```java
+package buckpal.cleanarchitecture.common;
+
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+public abstract class SelfValidating<T> {
+
+	private Validator validator;
+
+	public SelfValidating() {
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		validator = factory.getValidator();
+	}
+
+	protected void validateSelf() {
+		Set<ConstraintViolation<T>> violations = validator.validate((T)this);
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
+	}
+}
+
+```
+
+> SelfValidating 추상 클래스는 validateSelf()를 제공한다.  
+> 그 후 생성자 코드의 마지막 문장에서 이 메서드를 호출한다.  
+> 이 메서드가 필드에 지정된 Bean Validation 애너테이션을 검증하고,  
+> 유효성 검증 규칙을 위반한 경우 예외를 던진다.  
+> Bean Validation 검증 규칙을 표현하기에 충분하지 않다면 송금액이 0보다 큰지 검사했던 것처럼 직접 구현할 수 있다.
+
+</br>
+
+- SendMoneyCommand, Bean Validation을 통해서
+
+```java
+package buckpal.cleanarchitecture.account.application.port.in;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+
+import javax.validation.constraints.NotNull;
+
+import buckpal.cleanarchitecture.account.domain.Money;
+import buckpal.cleanarchitecture.common.SelfValidating;
+import lombok.Getter;
+
+@Getter
+public class SendMoneyCommand extends SelfValidating<SendMoneyCommand> {
+
+	@NotNull
+	private final AccountId sourceAccountId;
+
+	@NotNull
+	private final AccountId targetAccountId;
+
+	@NotNull
+	private final Money money;
+
+	public SendMoneyCommand(AccountId sourceAccountId,
+		AccountId targetAccountId, Money money) {
+		this.sourceAccountId = sourceAccountId;
+		this.targetAccountId = targetAccountId;
+		this.money = money;
+		this.validateSelf();
+	}
+}
+
+```
+
+> 입력 모델에 있는 유효성 검증 코드를 통해 유스케이스 구현체 주위에 사실상 오류 방지 계층을 만들었다.  
+> 여기서 말하는 계층은 하위 계층을 호출하는 계층형 아키텍처에서의 계층이 아니라  
+> 잘못된 입력을 호출자에게 돌려주는 유스케이스 보호막을 의미한다.
+
+</br>
+
+### 생성자의 힘
+
+</br>
+
+> 앞에서 살펴본 입력 모델인 SendMoneyCommand는 생성자에 많은 책임을 지우고 있다.  
+> 클래스가 불변이기 때문에 생성자의 리스트에는 클래스의 각 속성에 해당하는 파라미터들이 포함돼 있다.  
+> 그 뿐만 아니라 생성자가 파라미터의 유효성 검증까지 하고 있기때문에 유효하지 않은 상태의 객체를 만드는 것은 불가능 하다.
+>
+> 예제 코드의 생성자엔 3개의 파라미터만 있는데 더 많으면 어떻게 할까?  
+> 빌더 패턴을 활용하면 더 편하게 사용할 수 있을까?  
+> 긴 파라미터 리스트를 받아야하는 생성자를 private으로 만들고  
+> 빌더의 build() 메서드 내부에 생성자 호출을 숨길 수 있다.  
+> 그러면 파라미터가 20개인 생성자를 호출하는 대신 다음과 같이 객체를 만들 수 있을 것이다.
+
+```java
+new SendCommandBuilder()
+  .sourceAccountId(new AccountId(41L))
+  .targetAccountId(new AccountId(42L))
+  // ... 다른 필드
+  .build()
+```
+
+> 유효성 검증 로직은 생성자에 그대로 둬서 빌더가 유효하지 않은 상태의 객체를 생성하지 못하도록 막을 수 있다.
+>
+> 그렇다면 SendMoneyCommandBuilder에 필드를 계속 추가해야할 상황을 생각해보자.  
+> 먼저 생성자와 빌더에 새로운 필드를 추가한다.  
+> 그 후 빌더를 호출하는 코드에 새로운 필드를 추가하는 것을 잊고 만다...
+>
+> 컴파일러는 이처럼 유효하지 않은 상태의 불변 객체를 만들려는 시도에 대해서 경고하지 못한다.  
+> 물론 런타임에 유효성 검증 로직이 동작해서 예외를 던지긴 하지만 말이다.
+
+</br>
+
+- 내생각
+  - 사실 결정적으로 내가 빌더를 사용하지 않는 이유..
+  - 객체를 생성하는 시점에 컴파일 타임에 null pointer exception에 항상 노출 되어 있다.
+
+</br>
+
+### 유스케이스마다 다른 입력 모델
+
+</br>
+
+> 각기 다른 유스케이스에 동일한 입력 모델을 사용하고 싶은 생각이 들 때가 있다.  
+> `계좌 등록하기`와 `계좌 정보 업데이트 하기`라는 두 가지 유스케이스를 보자.  
+> 둘 모두 거의 똑같은 계좌 상세 정보가 필요하다.
+>
+> 차이점은 계좌 정보 업데이트하기 유스케이스는 업데이트할 계좌를 특정하기 위해 계좌 ID 정보를 필요로 하고  
+> 계좌 등록하기 유스케이스는 계좌를 귀속시킬 소유자의 ID 정보를 필요로 한다는 것이다.
+>
+> 따라서 두 유스케이스에서 같은 입력 모델을 공유할 경우 계좌 정보 업데이트하기에서는 소유자 ID에  
+> 계좌 등록하기에서는 계좌 ID에 null 값을 허용해야 한다.
+
+</br>
+
+> 불변 커맨드 객체의 필드에 대해서 null을 유효한 상태로 받아들이는 것은 그자체로 code smell이다.  
+> 하지만 더 문제가 되는 부분은 이제 입력 유효성을 어떻게 검증하는 것이다.  
+> 등록 유스케이스와 업데이트 유스케이스는 서로 다른 유효성 검증로직이 필요하다.  
+> 아마도 유스케이스에 커스텀 검증 로직을 넣어야할 테고, 이는 비즈니스 코드를 입력 유효성 검증과 관련된 관심사로 오염된다.
+
+</br>
+
+> 또, 만약 `계좌 등록하기` 유스케이스에서 계좌 ID 필드에 우연히 null 값이 아닌 값이 들어오면 어떻게 할까?  
+> 에러를 던질까? 그냥 무시할까?
+>
+> 각 유스케이스 전용 입력 모델은 유스케이스를 더 명확하게 만들고  
+> 다른 유스케이스와의 결합도 제거해서 불필요한 부수효과를 발생하지 않게 한다.  
+> 물론 비용이 안드는 것은 아니지만 들어오는 데이터를 각 유스케이스에 해당하는 입력 모델에 매핑해야 하기 때문이다.
+
+</br>
+
+### 비즈니스 규칙 검증하기
+
+</br>
+
+> 입력 유효성 검증은 유스케이스 로직의 일부가 아닌 반면, 비즈니스 규칙 검증은 분명히 유스케이스 로직의 일부다.  
+> 그러면 언제 입력 유효성을 검증하고 언제 비즈니스 규칙을 검증해야 할까?
+>
+> 둘의 실용적인 구분점은 비즈니스 규칙을 검증하는 것은 도메인 모델의 현재 상태에 접근해야하는 반면  
+> 입력 유효성 검증은 그럴 필요가 없다는 것이다.  
+> 입력 유효성을 검증하는 일은 @NotNull 애너테이션을 붙인 것처럼 선언적으로 구현할 수 있지만  
+> 비즈니스 규칙을 검증하는 일은 조금 더 맥락이 필요하다.
+>
+> `출금 계좌는 초과 출금되어서는 안된다`라는 규칙을 보자.  
+> 정의에 따르면 이 규칙은 출금 계좌와 입근 계좌가 존재하는지 확인하기 위해 모델의 현재 상태에 접근해야함으로 비즈니스 규칙이다.
+>
+> 반대로 `송금되는 금액은 0보다 커야한다`는 규칙은 모델에 접근하지 않고도 검증 될 수 있다.  
+> 그러므로 입력 유효성 검증으로 구현할 수 있다.
+
+</br>
+
+- 입력 유효성 검증과 비즈니스 규칙 검증의 차이는 모델의 상태에 접근하는지의 여부!
+
+</br>
+
+```java
+package buckpal.cleanarchitecture.account.domain;
+
+import java.time.LocalDateTime;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Value;
+
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Account {
+
+  //...
+
+	public boolean withdraw(Money money, AccountId targetAccountId){
+		if(!mayWithdraw(money)){
+			return false;
+		}
+
+		Activity withdrawal = new Activity(
+			this.id,
+			this.id,
+			targetAccountId,
+			LocalDateTime.now(),
+			money
+		);
+
+		this.activityWindow.addActivity(withdrawal);
+		return true;
+	}
+
+	private boolean mayWithdraw(Money money){
+		return Money.add(
+				this.calculateBalance(),
+				money.negate()
+			).isPositive();
+	}
+}
+```
+
+- 비즈니스 규칙을 검증하는 가장 좋은 방법은 비즈니스 규칙을 도메인 엔티티에 넣는 것이다.
+
+</br>
+
+> 만약 도메인 엔티티에서 비즈니스 규칙을 검증하기 애매하다면 유스케이스코드에서 도메인 엔티티를 사용하기 전에 해도 된다.
+
+</br>
+
+### 풍부한 도메인 모델 vs 빈약한 도메인 모델
+
+</br>
+
+> 풍부한 도메인 모델에서는 애플리케이션의 코어에 있는 엔티티에서 가능한 많은 도메인 로직이 구현된다.  
+> 엔티티들은 상태를 변경하는 메서드를 제공하고, 비즈니스 규칙에 맞는 유효한 변경만을 허용한다.
+>
+> 유스케이스는 도메인 모델의 진입점으로 동작한다.  
+> 이어서 유스케이스는 사용자의 의도만을 표현하면서 이 의도를 실제 작업을 수행하는 체계화된 도메인 엔티티 메서드 호출로 변환한다.  
+> `많은 비즈니스 규칙이 유스케이스 구현체 대신 엔티티에 위치한다.`
+>
+> 빈약한 도메인 모델에서는 엔티티가 얇다.  
+> 상태를 표현하는 필드와 값을 읽고 바꾸기 위한 getter, setter 메서드만 포함하고 어떤 도메인 로직도 가지고 있지 않다.  
+> 이말은 즉슨 도메인로직이 엔티티 클래스 내부가 아니라 유스케이스 클래스에 구현돼 있다는 것이다.  
+> 비즈니스 규칙을 검증하고 엔티티의 상태를 바꾸고, 데이터베이스 저장을 담당하는 아웃고잉 포트에 엔티티를 전달할 책임 역시 유스케이스 클래스에 있다.
+
+</br>
+
+### 읽기 전용 유스케이스는 어떨까?
+
+</br>
+
+> 계좌 잔고 보여주기 라고 부를 수 있는 특정 유스케이스를 구현하기 위해 요청한 데이터가 필요할 수도 있다.  
+> 만약 전체 프로젝트의 맥락에서 이러한 작업이 유스케이스로 분류된다면 어떻게든 다른 유스케이스와 비슷한 방식으로 구현해야 한다.
+>
+> 하지만 애플리케이션 코어의 관점에서는 이 작업은 간단한 데이터 쿼리이다.  
+> 그렇기에 프로젝트 맥락에서 유스케이스로 간주되지 않으면 실제 유스케이스와 구분하기 위해 쿼리로 구현할 수 있다.
+> 이 책의 아키텍처 스타일에서 이를 구현하는 한 가지 방법은 쿼리를 위한 인커밍 전용 포트를 만들고  
+> 이를 쿼리 서비스에 구현하는 것이다.
+
+</br>
+
+```java
+package buckpal.cleanarchitecture.account.application.port.in;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+
+import buckpal.cleanarchitecture.account.domain.Money;
+
+public interface GetAccountBalanceQuery {
+
+	Money getAccountBalance(AccountId accountId);
+
+}
+
+```
+
+</br>
+
+```java
+package buckpal.cleanarchitecture.account.application.service;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+
+import java.time.LocalDateTime;
+
+import buckpal.cleanarchitecture.account.application.port.in.GetAccountBalanceQuery;
+import buckpal.cleanarchitecture.account.application.port.out.LoadAccountPort;
+import buckpal.cleanarchitecture.account.domain.Money;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public class GetAccountBalanceService implements GetAccountBalanceQuery {
+
+	private final LoadAccountPort loadAccountPort;
+
+	@Override
+	public Money getAccountBalance(AccountId accountId) {
+		return loadAccountPort.loadAccount(accountId, LocalDateTime.now())
+			.calculateBalance();
+	}
+}
+
+```
+
+</br>
+
+> 쿼리 서비스는 유스케이스 서비스와 동일한 방식으로 동작한다.  
+> GetAccountBalanceQuery라는 인커밍 포트를 구현하고  
+> 데이터베이스로부터 실제로 데이터를 로드하기 위해 LoadAccountPort라는 아웃고잉 포트를 호출한다.
+>
+> 이처럼 읽기 전용 쿼리는 쓰기가 가능한 유스케이스와ㅏ 코드 상에서 명확하게 구분된다.  
+> 이런 방식은 CQS나 CQRS같은 개념과 잘 맞다.
+
+</br>
+
+### 유지보수 가능한 소프트웨어를 만드는데 어떻게 도움을 줄까?
+
+</br>
+
+> 이책의 아키텍처는 도메인 로직을 내 마음대로 구현할 수 있도록 허용하지만,  
+> 입출력 모델을 독립적으로 모델링한다면 원치않는 부수효과를 피할 수 있다.
+>
+> 물론 유스케이스 간에 모델을 공유하는 것보다 더 많은 작업이 필요하고  
+> 각 유스케이스마다 별도의 모델을 만들어야 하고, 이 모델과 엔티티를 매핑해야 한다.
+>
+> 그러나 유스케이스별로 모델을 만들면 유스케이스를 명확하게 이해할 수 있고  
+> 장기적으로 유지보수하기도 쉽다.  
+> 꼼꼼한 입력 유효성 검증, 유스케이스별 입출력 모델은 지속 가능한 코드를 만드는데 도움이 될 것이다.
 
 </br>
 
