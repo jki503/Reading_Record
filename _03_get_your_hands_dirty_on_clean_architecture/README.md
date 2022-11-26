@@ -269,9 +269,9 @@ Author: Jung
 > 이것은 도메인 코드가 바깥으로 향하는 어떤 의존성도 없어야 함을 의미한다.
 > 대신 의존성 역전 원칙의 도움으로 모든 의존성이 도메인 코드를 향하고 있다.
 
-|                         clean architecture                          |
-| :-----------------------------------------------------------------: |
-| ![clean architecture](./res/_02_clean_architecture.jpeg.crdownload) |
+|                    clean architecture                    |
+| :------------------------------------------------------: |
+| ![clean architecture](./res/_02_clean_architecture.jpeg) |
 
 </br>
 
