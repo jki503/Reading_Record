@@ -28,6 +28,10 @@ Author: Jung
   - [읽기 전용 유스케이스는 어떨까?](#읽기-전용-유스케이스는-어떨까)
   - [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움을 줄까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움을-줄까)
 - [05. 웹 어댑터 구현하기](#05-웹-어댑터-구현하기)
+  - [05 - 의존성 역전 원칙](#05---의존성-역전-원칙)
+  - [웹 어댑터의 책임](#웹-어댑터의-책임)
+  - [컨트롤러 나누기](#컨트롤러-나누기)
+  - [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움이-될까)
 - [06. 영속성 어댑터 구현하기](#06-영속성-어댑터-구현하기)
 - [07. 아키텍처 요소 테스트 하기](#07-아키텍처-요소-테스트-하기)
 - [08. 경계간 매핑하기](#08-경계간-매핑하기)
@@ -908,6 +912,238 @@ public class GetAccountBalanceService implements GetAccountBalanceQuery {
 ## 05. 웹 어댑터 구현하기
 
 </br>
+
+### 05 - 의존성 역전 원칙
+
+</br>
+
+| 인커밍 어댑터는 애플리케이션 서비스에 의해 구현된 인터페이스인 전용 포트를 통해 애플리케이션 계층과 통신 |
+| :------------------------------------------------------------------------------------------------------: |
+|                                    ![adapter](./res/_05_adapter.png)                                     |
+
+</br>
+
+> 웹 어댑터는 `주도하는` 혹은 `인커밍` 어댑터다.  
+> 외부로부터 요청을 받아 애플리케이션 코어를 호출하고 무슨 일을 해야할 지 알려준다.  
+> 이때 제어 흐름은 웹 어댑터에 있는 컨트롤러에서 애플리케이션 계층에 있는 서비스로 흐른다.
+
+</br>
+
+> 그리고 애플리케이션 계층은 웹 어댑터가 통신할 수 있는 특정 포트를 제공한다.  
+> 서비스는 이 포트를 구현하고, 웹 어댑터는 이 포트를 호출할 수 있다.
+>
+> 즉, 제어의 흐름이 왼쪽에서 오른쪽으로 흐르기 때문에  
+> 웹 어댑터가 유스케이스를 직접 호출할 수 있다.  
+> 의존성 역전 원칙이 적용된 것을 확인 할 수 있다!
+
+</br>
+
+> 그럼 왜 어댑터와 유스케이스 사이에 또 다른 간접 계층을 넣어야 할까?  
+> 애플리케이션 코어가 외부 세계와 통신할 수 있는 곳에 대한 명세가 있는 포트이기 때문이다.  
+> 포트를 적절한 곳에 위치시키면 외부와 어떤 통신이 일어나고 있는지 정확히 알 수 있고,  
+> 이는 레거시 코드를 다루는 유지보수 엔지니어에게 무척 소중한 정보다.
+
+</br>
+
+> 웹 어댑터는 데이터를 어떻게 사용자의 브라우저로 전송하는 것일까?  
+> 이 시나리오에서는 반드시 포트가 필요하다.  
+> 이 포트는 웹 어댑터에서 구현하고 애플리케이션 코어에서 호출해야 한다.
+
+</br>
+
+|                  outgoing port                   |
+| :----------------------------------------------: |
+| ![outgoing port](./res/_05_outgoing_adapter.png) |
+
+</br>
+
+> 만약 애플리케이션이 웹 어댑터에 능동적으로 알림을 줘야 한다면  
+> 올바를 방향으로 유지하기 위해 아웃고잉 포트를 통과해야한다.
+>
+> 엄밀히 말하자면 이 포트는 아웃고잉 포트이기 때문에 이제 웹 어댑터는  
+> 인커밍 어댑터인 동시에 아웃고잉 어댑터가 된다.
+
+</br>
+
+### 웹 어댑터의 책임
+
+</br>
+
+1. HTTP 요청을 자바 객체로 매핑
+2. 권한 검사
+3. 입력 유효성 검증
+4. 입력을 유스케이스의 입력 모델로 매핑
+5. 유스케이스 호출
+6. 유스케이스의 출력을 HTTP로 매핑
+7. HTTP 응답을 반환
+
+</br>
+
+> 여기서 말하는 입력 유효성 검증은 웹어댑터의 입력 모델을  
+> 유스케이스의 입력 모델로 변환할 수 있다는 것을 검증해야 한다.
+>
+> 즉, 유스케이스 입력 모델과 구조나 의미가 다를 수 있기에 다른 유효성 검증을 해야하고  
+> 유스케이스 입력 모델에서 했던 유효성 검증을 똑같이 웹 어댑터에서도 구현해야하는 것은 아니다.
+
+</br>
+
+> 웹 어댑터의 책임이 많기는 하지만 이러한 책임들은 애플리케이션 계층이 신경쓰면 안되는 것들이다.  
+> HTTP와 관련된 것은 애플리케이션 계층으로 침투하면 안 된다.  
+> 우리가 바깥 계층에서 HTTP를 다루고 있다는 것을 애플리케이션 코어가 알게 되면  
+> HTTP를 사용하지 않는 또 다른 인커밍 어댑터의 요청에 대해  
+> 동일한 도메인 로직을 수행할 수 있는 선택지를 잃게 된다!
+
+</br>
+
+### 컨트롤러 나누기
+
+```java
+package buckpal.cleanarchitecture.account.adapter;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import buckpal.cleanarchitecture.account.application.port.in.GetAccountBalanceQuery;
+import lombok.RequiredArgsConstructor;
+
+@RestController("/accounts")
+@RequiredArgsConstructor
+public class AccountController {
+
+	private final GetAccountBalanceQuery getAccountBalanceQuery;
+
+	private final ListAccountsQuery listAccountsQuery;
+
+	private final LoadAccountQuery loadAccountQuery;
+
+	@GetMapping
+	public List<AccountResource> listAccounts(){
+		...
+	}
+
+	@GetMapping("/{accountId}")
+	public AccountResource getAccount(@PathVariable("accountId") Long accountId){
+		...
+	}
+
+	@GetMapping("/{accountId}/balance")
+	public long getAccountBalance(@PathVariable("accountId") Long accountId){
+		...
+	}
+
+	@PostMapping
+	public AccountResource createAccount(@RequestBody AccountResource account){
+		...
+	}
+
+	@PostMapping("/send/{sourceAccountId}/{targetAccountId}/{amount}")
+	public void sendMoney
+		(
+			@PathVariable("sourceAccountId") Long sourceAccountId,
+			@PathVariable("targetAccountId") Long targetAccountId,
+			@PathVariable("amount") Long amount
+		)
+	{
+		...
+	}
+}
+
+```
+
+> 우리가 자주 사용하는 방식은 AccountController를  
+> 하나 만들어서 계좌와 관련된 모든 요청을 받는 것이다.
+
+</br>
+
+- 이 방식의 단점
+  - 클래스마다 코드는 적을 수록 좋다.
+    - 아무리 메서드로 깔끔하게 분리해도 파악하기 쉽지 않다.
+  - 테스트 코드도 같이 길어진다.
+    - 컨트롤러에 코드가 많으면 그에 해당하는 테스트 코드도 많아진다.
+    - 또한 테스트 코드는 더 추상적이기 때문에 프로덕션 코드에 비해 파악하기 어렵다.
+  - 모든 연산을 단일 컨트롤러에 넣는 것은 데이터 구조의 재활용을 촉진한다.
+
+> 그래서 책의 저자는 각 연산에 대해 가급적이면 별도의 패키지 안에  
+> 별도의 컨트롤러를 만드는 방식을 선호한다.
+>
+> 또한, 메서드와 클래스명은 유스케이스를 최대한 반영해서 지어야 한다.
+
+</br>
+
+- 개선하기
+
+```java
+package buckpal.cleanarchitecture.account.adapter;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyCommand;
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyUseCase;
+import buckpal.cleanarchitecture.account.domain.Money;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequiredArgsConstructor
+public class SendMoneyController {
+
+	private final SendMoneyUseCase sendMoneyUseCase;
+
+	@PostMapping("/accounts/send/{sourceAccountId}/{targetAccountId}/{amount}")
+	public void sendMoney(
+		@PathVariable("sourceAccountId") Long sourceAccountId,
+		@PathVariable("targetAccountId") Long targetAccountId,
+		@PathVariable("amount") Long amount
+	) {
+		SendMoneyCommand command = new SendMoneyCommand(
+			new AccountId(sourceAccountId),
+			new AccountId(targetAccountId),
+			Money.of(amount)
+		);
+
+		sendMoneyUseCase.sendMoney(command);
+	}
+
+}
+
+```
+
+> 또한 각 컨트롤러가 CreateAccountResource나 UpdateAccountResource 같은 컨트롤러  
+> 자체의 모델을 가지고 있거나, 앞의 예제 코드처럼 원시 값을 받아도 된다.
+>
+> 이러한 전용 모델 클래스들은 컨트롤러의 패키지에 대해 Private으로 선언할 수 있기 때문에  
+> 실수로 다른 곳에서 재사용될 일이 없다.
+>
+> 컨트롤러끼리는 모델을 공유할 수 있지만 다른 패키지에 있는 덕분에  
+> 공유해서 사용하기 전에 다시 한 번 생각해 볼 수 있고,  
+> 다시 생각해봤을 때, 필드의 절반은 사실 필요 없다는 걸 깨달아서  
+> 결국 컨트롤러에 맞는 모델을 새로 만들게 될 확률이 높다
+>
+> 또, 컨트롤러명과 서비스명에 대해서도 잘 생각해봐야 한다.  
+> 예를 들어, CreateAccount보다는 RegisterAccount가 더 나은 이름같지 않은가?
+>
+> 는 저자의 네이밍 성향인 것같고, 부분 공감하기도, 부분 공감하지 못하기도 하니  
+> 네이밍은 유스케이스에 맞춰서 고민해보되, CRUD가 명확하다면 CRUD를 사용해보자!
+>
+> `이렇게 나누는 스타일의 또 다른 장점은 서로 다른 연산에 대한 동시 작업이 쉬워진다!`
+
+### 유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까?
+
+</br>
+
+> 애플리케이션의 웹 어댑터를 구현 할 때 HTTP 요청을  
+> 애플리케이션의 유스케이스에 대한 메서드 호출로 변환하고  
+> 결과를 다시 HTTP로 변환하고 어떤 도메인 로직도 수행하지 않는  
+> 어댑터를 만들고 있다는 것을 염두해야한다.
+>
+> 반면 애플리케이션 계층은 HTTP에 대한  
+> 상세 정보를 노출 시키지 않도록 HTTP와 관련된 작업을 해서는 안된다.
 
 </br>
 
