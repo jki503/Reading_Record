@@ -1,6 +1,7 @@
 package buckpal.cleanarchitecture.account.domain;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,15 +20,28 @@ public class Account {
 	@Getter
 	private final ActivityWindow activityWindow;
 
-	public Money calculateBalance(){
+	public static Account withoutId(
+		Money baselineBalance,
+		ActivityWindow activityWindow) {
+		return new Account(null, baselineBalance, activityWindow);
+	}
+
+	public static Account withId(
+		AccountId accountId,
+		Money baselineBalance,
+		ActivityWindow activityWindow) {
+		return new Account(accountId, baselineBalance, activityWindow);
+	}
+
+	public Money calculateBalance() {
 		return Money.add(
 			this.baselineBalance,
 			this.activityWindow.calculateBalance(this.id)
 		);
 	}
 
-	public boolean withdraw(Money money, AccountId targetAccountId){
-		if(!mayWithdraw(money)){
+	public boolean withdraw(Money money, AccountId targetAccountId) {
+		if (!mayWithdraw(money)) {
 			return false;
 		}
 
@@ -43,15 +57,30 @@ public class Account {
 		return true;
 	}
 
-	private boolean mayWithdraw(Money money){
+	public boolean deposit(Money money, AccountId sourceAccountId) {
+		Activity deposit = new Activity(
+			this.id,
+			sourceAccountId,
+			this.id,
+			LocalDateTime.now(),
+			money);
+		this.activityWindow.addActivity(deposit);
+		return true;
+	}
+
+	private boolean mayWithdraw(Money money) {
 		return Money.add(
-				this.calculateBalance(),
-				money.negate()
-			).isPositive();
+			this.calculateBalance(),
+			money.negate()
+		).isPositive();
+	}
+
+	public Optional<AccountId> getId() {
+		return Optional.ofNullable(this.id);
 	}
 
 	@Value
-	public static class AccountId{
+	public static class AccountId {
 		private Long value;
 	}
 }

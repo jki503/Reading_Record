@@ -4,37 +4,60 @@ Author: Jung
 ---
 
 - [01. 계층형 아키텍처의 문제는 무엇일까?](#01-계층형-아키텍처의-문제는-무엇일까)
-  - [계층형 아키텍처는 데이터베이스 주도 설계를 유도한다](#계층형-아키텍처는-데이터베이스-주도-설계를-유도한다)
-  - [지름길을 택하기 쉬워진다](#지름길을-택하기-쉬워진다)
-  - [테스트하기 어려워진다](#테스트하기-어려워진다)
-  - [유스케이스를 숨긴다](#유스케이스를-숨긴다)
-  - [동시 작업이 어려워진다](#동시-작업이-어려워진다)
+	- [계층형 아키텍처는 데이터베이스 주도 설계를 유도한다](#계층형-아키텍처는-데이터베이스-주도-설계를-유도한다)
+	- [지름길을 택하기 쉬워진다](#지름길을-택하기-쉬워진다)
+	- [테스트하기 어려워진다](#테스트하기-어려워진다)
+	- [유스케이스를 숨긴다](#유스케이스를-숨긴다)
+	- [동시 작업이 어려워진다](#동시-작업이-어려워진다)
 - [02. 의존성 역전하기](#02-의존성-역전하기)
-  - [단일 책임원칙](#단일-책임원칙)
-  - [의존성 역전 원칙](#의존성-역전-원칙)
-  - [클린 아키텍처](#클린-아키텍처)
-  - [헥사고날 아키텍처](#헥사고날-아키텍처)
-  - [유지보수 가능한 소포트웨어를 만드는데 어떻게 도움이 될까?](#유지보수-가능한-소포트웨어를-만드는데-어떻게-도움이-될까)
+	- [단일 책임원칙](#단일-책임원칙)
+	- [의존성 역전 원칙](#의존성-역전-원칙)
+	- [클린 아키텍처](#클린-아키텍처)
+	- [헥사고날 아키텍처](#헥사고날-아키텍처)
+	- [유지보수 가능한 소포트웨어를 만드는데 어떻게 도움이 될까?](#유지보수-가능한-소포트웨어를-만드는데-어떻게-도움이-될까)
 - [03. 코드 구성하기](#03-코드-구성하기)
-  - [아키텍처적으로 표현력 있는 패키지 구조](#아키텍처적으로-표현력-있는-패키지-구조)
-  - [의존성 주입의 역할](#의존성-주입의-역할)
+	- [아키텍처적으로 표현력 있는 패키지 구조](#아키텍처적으로-표현력-있는-패키지-구조)
+	- [의존성 주입의 역할](#의존성-주입의-역할)
 - [04. 유스케이스 구현하기](#04-유스케이스-구현하기)
-  - [유스케이스 둘러보기](#유스케이스-둘러보기)
-  - [입력 유효성 검증](#입력-유효성-검증)
-  - [생성자의 힘](#생성자의-힘)
-  - [유스케이스마다 다른 입력 모델](#유스케이스마다-다른-입력-모델)
-  - [비즈니스 규칙 검증하기](#비즈니스-규칙-검증하기)
-  - [풍부한 도메인 모델 vs 빈약한 도메인 모델](#풍부한-도메인-모델-vs-빈약한-도메인-모델)
-  - [읽기 전용 유스케이스는 어떨까?](#읽기-전용-유스케이스는-어떨까)
-  - [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움을 줄까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움을-줄까)
+	- [유스케이스 둘러보기](#유스케이스-둘러보기)
+	- [입력 유효성 검증](#입력-유효성-검증)
+	- [생성자의 힘](#생성자의-힘)
+	- [유스케이스마다 다른 입력 모델](#유스케이스마다-다른-입력-모델)
+	- [비즈니스 규칙 검증하기](#비즈니스-규칙-검증하기)
+	- [풍부한 도메인 모델 vs 빈약한 도메인 모델](#풍부한-도메인-모델-vs-빈약한-도메인-모델)
+	- [읽기 전용 유스케이스는 어떨까?](#읽기-전용-유스케이스는-어떨까)
+	- [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움을 줄까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움을-줄까)
 - [05. 웹 어댑터 구현하기](#05-웹-어댑터-구현하기)
-  - [05 - 의존성 역전 원칙](#05---의존성-역전-원칙)
-  - [웹 어댑터의 책임](#웹-어댑터의-책임)
-  - [컨트롤러 나누기](#컨트롤러-나누기)
-  - [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움이-될까)
+	- [05 - 의존성 역전 원칙](#05---의존성-역전-원칙)
+	- [웹 어댑터의 책임](#웹-어댑터의-책임)
+	- [컨트롤러 나누기](#컨트롤러-나누기)
+	- [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까?](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움이-될까)
 - [06. 영속성 어댑터 구현하기](#06-영속성-어댑터-구현하기)
+	- [의존성 역전](#의존성-역전)
+	- [영속성 어댑터의 책임](#영속성-어댑터의-책임)
+	- [포트 인터페이스 나누기](#포트-인터페이스-나누기)
+	- [영속성 어댑터 나누기](#영속성-어댑터-나누기)
+	- [스프링 데이터 JPA 예제](#스프링-데이터-jpa-예제)
+	- [데이터 베이스 트랜잭션은 어떻게 해야 할까?](#데이터-베이스-트랜잭션은-어떻게-해야-할까)
+	- [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까? - 6장](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움이-될까---6장)
 - [07. 아키텍처 요소 테스트 하기](#07-아키텍처-요소-테스트-하기)
+	- [테스트 피라미드](#테스트-피라미드)
+	- [단위 테스트로 도메인 엔티티 테스트하기](#단위-테스트로-도메인-엔티티-테스트하기)
+	- [단위 테스트로 유스케이스 테스트하기](#단위-테스트로-유스케이스-테스트하기)
+	- [통합 테스트로 웹 어댑터 테스트하기](#통합-테스트로-웹-어댑터-테스트하기)
+	- [통합 테스트로 영속성 어댑터 테스트하기](#통합-테스트로-영속성-어댑터-테스트하기)
+	- [시스템 테스트로 주요 경로 테스트하기](#시스템-테스트로-주요-경로-테스트하기)
+	- [얼마만큼의 테스트가 충분할까?](#얼마만큼의-테스트가-충분할까)
+	- [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까? - 7장](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움이-될까---7장)
 - [08. 경계간 매핑하기](#08-경계간-매핑하기)
+	- [매핑하지 않기 전략](#매핑하지-않기-전략)
+	- [양방향 매핑 전략](#양방향-매핑-전략)
+		- [장점](#장점)
+		- [단점](#단점)
+	- [완전 매핑 전략](#완전-매핑-전략)
+	- [단방향 매핑 전략](#단방향-매핑-전략)
+	- [언제 어떤 매핑 전략을 사용할 것인가?](#언제-어떤-매핑-전략을-사용할-것인가)
+	- [유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까? - 8장](#유지보수-가능한-소프트웨어를-만드는데-어떻게-도움이-될까---8장)
 - [09. 애플리케이션 조립하기](#09-애플리케이션-조립하기)
 - [10. 아키텍처 경계 강제하기](#10-아키텍처-경계-강제하기)
 - [11. 의식적으로 지름길 사용하기](#11-의식적으로-지름길-사용하기)
@@ -1151,17 +1174,1227 @@ public class SendMoneyController {
 
 </br>
 
+> 전통적인 계층형 아키텍처는 모든 것이 영속성 계층에 의존하게 되어 `데이터베이스 주도 설계`가 된다.  
+> 이러한 의존성을 역전시키기 위해 영속성 계층을 애플리케이션 계층의 플러그인으로 만드는 방법이다.
+
+</br>
+
+### 의존성 역전
+
+</br>
+
+> 영속성 계층 대신 애플리케이션 서비스에 영속성 기능을 제공하는 영속성 어댑터를 만들자.
+
+|            코어의 서비스가 영속성 어댑터에 접근하기 위해 포트를 사용한다            |
+| :---------------------------------------------------------------------------------: |
+| ![코어의 서비스가 영속성 어댑터에 접근하기 위해 포트를 사용한다](./res/_06_dip.png) |
+
+</br>
+
+- 애플리케이션 서비스에서는 영속성 기능을 사용하기 위해 포트 인터페이스를 호출한다.
+  - 이 포트는 실제로 영속성 작업을 수행하고 데이터베이스와 통신할 책임을 가진 영속성 어댑터 클래스에 의해 구현된다
+- 육각형 아키텍처에서 영속성 어댑터는 ‘주도되는' 혹은 ‘아웃고잉’ 어댑터다. 애플리케이션에 의해 호출될 뿐 애플리케이션을 호출하지 않는다.
+- 포트는 사실상 애플리케이션 서비스와 영속성 코드 사이의 간접적인 계층이다. 영속성 문제에 신경 쓰지않고 도메인 코드를 개발하고 영속성 계층에 대한 코드 의존성을 없애기 위해 이러한 간접 계층을 추가하고 있다. 영속성 코드를 리팩토링하더라도 코어 코드를 변경하는 결과로 이어지지 않는다.
+- 런타임시에도 의존성은 애플리케이션 코어에서 영속성 어댑터로 향한다. 영속성 계층의 코드를 변경하는 중에 버그가 생기면 애플리케이션 코어의 기능은 망가질 것이다. 하지만 포트가 계약을 만족하는 한 코어에 영향을 미치지않으면서 영속성 코드를 수정할 수 있다.
+
+</br>
+
+### 영속성 어댑터의 책임
+
+</br>
+
+1. 입력을 받는다.
+   - 포트 인터페이스를 통해 입력을 받는다.
+   - 입력 모델은 인터페이스가 지정한 도메인 엔티티나 특정 데이터베이스 연산 적용 객체가 된다.
+2. 입력을 데이터베이스 포맷으로 매핑한다.
+   - 데이터베이스를 쿼리하거나 변경하는 데 사용할 수 있는 포맷으로 입력 모델을 매핑한다.
+   - 일반적으로 JPA를 사용하기 때문에 입력 모델을 JPA 엔티티로 매핑하는 것이 들이는 노력에 비해 얻는 것이 많지 않은 일이 될 수 있다.
+3. 입력을 데이터베이스로 보낸다.
+4. 데이터베이스 출력을 애플리케이션 포맷으로 매핑한다.
+5. 출력을 반환한다.
+   - 출력 모델은 영속성 어댑터가 아니라 애플리케이션 코어에 위치한다.
+
+</br>
+
+### 포트 인터페이스 나누기
+
+</br>
+
+|                 포트 인터페이스 나누기                  |
+| :-----------------------------------------------------: |
+| ![포트 인터페이스 나누기](./res/_06_port_interface.png) |
+
+> 데이터베이스 연산을 정의하고 있는 인터페이스는 보통 특정 엔티티가 필요로 하는 모든 데이터베이스 연산을  
+> 하나의 리포지토리 인터페이스에 넣어 두는 것이 일반적인 방법이다.
+>
+> 하나의 아웃고잉 포트 인터페이스에 모든 데이터베이스 연산을 모아두면 모든 서비스가 실제로는 필요하지 않은 메서드에 의존하게 된다.
+
+</br>
+
+- 각 서비스가 단 하나의 메서드만 사용하더라도 ‘넓은' 포트 인터페이스에 의존성을 가지게 된다.
+- 필요하지 않은 메서드에 생긴 의존성은 코드를 이해하거나 테스트하기에 어렵게 만든다.
+  - 서비스의 단위 테스트를 작성할 때 Repository의 일부 메서드만 모킹하게 된다.
+
+</br>
+
+| 인터페이스 분리 원칙을 적용하여 불필요한 의존성을 제거하고 기존 의존성을 눈에 더 잘 띄게 만들 수 있다. |
+| :----------------------------------------------------------------------------------------------------: |
+|                                       ![ISP](./res/_06_isp.png)                                        |
+
+- 이제 각 서비스는 실제로 필요한 메서드에만 의존한다. 나아가 포트의 이름이 포트의 역할을 명확하게 잘 표현하고 있다. 테스트에서는 어떤 메서드를 모킹할지 고민할 필요가 없다. 대부분의 경우 포트당 하나의 메서드만 있기 때문이다.
+- 이렇게 매우 좁은 포트를 만드는 것은 코딩을 플러그 앤드 플레이(plug-and-play) 경험으로 만든다. 서비스 코드를 짤 때는 필요한 포트에 그저 ‘꽂기만' 하면 된다. 운반할 다른 화물이 없는 것이다.
+- 물론 모든 상황에 ‘포트 하나당 하나의 메서드'를 적용하지는 못한다. 응집성이 높고 함께 사용될 때가 많기 때문에 하나의 인터페이스에 묶고 싶은 데이터베이스 연산들이 있을 수 있다.
+
+</br>
+
+### 영속성 어댑터 나누기
+
+</br>
+
+| 하나의 애그리거트당 하나의 영속성 어댑터를 만들어서 여러개의 영속성 어댑터를 만들 수도 있다. |
+| :------------------------------------------------------------------------------------------: |
+|                            ![aggregate](./res/_06_aggregate.png)                             |
+
+</br>
+
+- 영속성 어댑터들은 각 영속성 기능을 이용하는 도메인 경계를 따라 자동으로 나눠진다.
+- JPA 어댑터와 평이한 SQL 어댑터 하나를 만들고 각각이 영속성 포트의 일부분을 구현하면 된다.
+- 도메인 코드는 영속성 포트에 의해 정의된 명세를 어떤 클래스가 충족시키는지에 관심없다. 모든 포트가 구현되어 있기만하면 영속성 계층에서 하고 싶은 어떤 작업이든 해도 된다.
+- `애그리거트당 하나의 영속성 어댑터` 접근 방식 또한 나중에 여러 개의 바운디드 컨텍스트의 영속성 요구사항을 분리하기 위한 토대가 된다.
+
+</br>
+
+> 앞으로 구현할 biiling 유스케이스를 책임지는 바운디드 컨텍스트이다.
+
+</br>
+
+|                   billing bounded context                   |
+| :---------------------------------------------------------: |
+|  ![billing bounded context](./res/_06_bounded_context.png)  |
+| ![billing bounded context2](./res/_06_bounded_context2.png) |
+
+> 바운디드 컨텍스트 간의 경계를 명확히 구분하고 싶다면 각 바운디드 컨텍스트가 영속성 어댑터를 가지고 있어야 한다.
+
+</br>
+
+- 각 바운디드 컨텍스트는 영속성 어댑터를 하나씩(하나 이상일 수도 있다) 가지고 있다.
+- `바운디드 컨텍스트`라는 표현은 경계를 암시한다.
+- account 맥락의 서비스는 billing 맥락의 영속성 어댑터에 접근하지 않고 반대도 마찬가지다.
+- 어떤 맥락이 다른 맥락에 있는 무언가를 필요로 한다면 전용 인커밍 포트를 통해 접근해야 한다.
+
+### 스프링 데이터 JPA 예제
+
+</br>
+
+- Account.java
+
+```java
+package buckpal.cleanarchitecture.account.domain;
+
+import java.time.LocalDateTime;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Value;
+
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Account {
+
+	@Getter
+	private final AccountId id;
+
+	@Getter
+	private final Money baselineBalance;
+
+	@Getter
+	private final ActivityWindow activityWindow;
+
+	public static Account withoutId(
+		Money baselineBalance,
+		ActivityWindow activityWindow) {
+		return new Account(null, baselineBalance, activityWindow);
+	}
+
+	public static Account withId(
+		AccountId accountId,
+		Money baselineBalance,
+		ActivityWindow activityWindow) {
+		return new Account(accountId, baselineBalance, activityWindow);
+	}
+
+	public Money calculateBalance() {
+		return Money.add(
+			this.baselineBalance,
+			this.activityWindow.calculateBalance(this.id)
+		);
+	}
+
+	public boolean withdraw(Money money, AccountId targetAccountId) {
+		if (!mayWithdraw(money)) {
+			return false;
+		}
+
+		Activity withdrawal = new Activity(
+			this.id,
+			this.id,
+			targetAccountId,
+			LocalDateTime.now(),
+			money
+		);
+
+		this.activityWindow.addActivity(withdrawal);
+		return true;
+	}
+
+	public boolean deposit(Money money, AccountId sourceAccountId) {
+		Activity deposit = new Activity(
+			this.id,
+			sourceAccountId,
+			this.id,
+			LocalDateTime.now(),
+			money);
+		this.activityWindow.addActivity(deposit);
+		return true;
+	}
+
+	private boolean mayWithdraw(Money money) {
+		return Money.add(
+			this.calculateBalance(),
+			money.negate()
+		).isPositive();
+	}
+
+	@Value
+	public static class AccountId {
+		private Long value;
+	}
+}
+
+```
+
+- Account 클래스는 getter와 setter만 가진 간단한 데이터 클래스가 아니며 최대한 불변성을 유지하려 한다는 사실을 상기하자
+- 유효한 상태의 Account 엔티티만 생성할 수 있는 팩터리 메서드를 제공하고 출근 전에 계좌의 잔고를 확인하는 일과 같은 유효성 검증을 모든 상태 변경 메서드에서 수행하기 때문에 유효하지 않은 도메인 모델을 생성할 수 없다.
+- 데이터베이스와의 통신에 스프링 데이터 JPA(Spring Data JPA)를 사용할 것이므로 계좌의 데이터베이스 상태를 표현하는 @Entity 애너테이션이 추가된 클래스도 필요하다.
+
+</br>
+
+- AccountJpaEntity.java
+
+```java
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "account")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class AccountJpaEntity {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
+}
+```
+
+- 계좌의 상태가 ID 하나만으로 구성되어 있다.
+- 나중에 사용자 ID 같은 필드가 추가될 것이다.
+
+</br>
+
+- ActivityJpaEntity.java
+
+```java
+package buckpal.cleanarchitecture.account.adapter.out.persistence;
+
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "activity")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+class ActivityJpaEntity {
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
+	@Column
+	private LocalDateTime timestamp;
+
+	@Column
+	private Long ownerAccountId;
+
+	@Column
+	private Long sourceAccountId;
+
+	@Column
+	private Long targetAccountId;
+
+	@Column
+	private Long amount;
+
+}
+
+```
+
+- JPA @ManyToOne이나 @OneToMany 애너테이션을 이용해 ActivityJpaEntity 와 AccountJpaEntity 를 연결해서 관계를 표현할 수도 있었지만 데이터베이스 쿼리에 부수효과가 생길 수 있기 때문에 이 부분을 제외하기로 결정했다.
+- JPA 보다는 조금 더 간단한 ORM을 이용하는 편이 영속성 어댑터를 구현하기 더 쉽지만 앞으로 JPA가 제공하는 다른 기능이 필요할 수 있다.
+
+</br>
+
+- ActivityRepository.java
+
+```java
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+interface ActivityRepository extends JpaRepository<ActivityJpaEntity, Long> {
+
+	@Query("select a from ActivityJpaEntity a " +
+			"where a.ownerAccountId = :ownerAccountId " +
+			"and a.timestamp >= :since")
+	List<ActivityJpaEntity> findByOwnerSince(
+			@Param("ownerAccountId") Long ownerAccountId,
+			@Param("since") LocalDateTime since);
+
+	@Query("select sum(a.amount) from ActivityJpaEntity a " +
+			"where a.targetAccountId = :accountId " +
+			"and a.ownerAccountId = :accountId " +
+			"and a.timestamp < :until")
+	Long getDepositBalanceUntil(
+			@Param("accountId") Long accountId,
+			@Param("until") LocalDateTime until);
+
+	@Query("select sum(a.amount) from ActivityJpaEntity a " +
+			"where a.sourceAccountId = :accountId " +
+			"and a.ownerAccountId = :accountId " +
+			"and a.timestamp < :until")
+	Long getWithdrawalBalanceUntil(
+			@Param("accountId") Long accountId,
+			@Param("until") LocalDateTime until);
+
+}
+```
+
+- 스프링 부트는 이 리포지토리를 자동으로 찾고 스프링 데이터는 실제로 데이터베이스와 통신하는 리포지토리 인터페이스 구현체를 제공한다.
+
+</br>
+
+- AccountPersistenceAdpater.java
+
+```java
+package buckpal.cleanarchitecture.account.adapter.out.persistence;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.persistence.EntityNotFoundException;
+
+import buckpal.cleanarchitecture.account.application.port.out.LoadAccountPort;
+import buckpal.cleanarchitecture.account.application.port.out.UpdateAccountStatePort;
+import buckpal.cleanarchitecture.account.domain.Account;
+import buckpal.cleanarchitecture.account.domain.Activity;
+import buckpal.cleanarchitecture.common.PersistenceAdapter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@PersistenceAdapter
+class AccountPersistenceAdapter implements
+	LoadAccountPort,
+	UpdateAccountStatePort {
+
+	private final SpringDataAccountRepository accountRepository;
+	private final ActivityRepository activityRepository;
+	private final AccountMapper accountMapper;
+
+	@Override
+	public Account loadAccount(
+		AccountId accountId,
+		LocalDateTime baselineDate) {
+
+		AccountJpaEntity account =
+			accountRepository.findById(accountId.getValue())
+				.orElseThrow(EntityNotFoundException::new);
+
+		List<ActivityJpaEntity> activities =
+			activityRepository.findByOwnerSince(
+				accountId.getValue(),
+				baselineDate);
+
+		Long withdrawalBalance = orZero(activityRepository
+			.getWithdrawalBalanceUntil(
+				accountId.getValue(),
+				baselineDate));
+
+		Long depositBalance = orZero(activityRepository
+			.getDepositBalanceUntil(
+				accountId.getValue(),
+				baselineDate));
+
+		return accountMapper.mapToDomainEntity(
+			account,
+			activities,
+			withdrawalBalance,
+			depositBalance);
+
+	}
+
+	private Long orZero(Long value) {
+		return value == null ? 0L : value;
+	}
+
+	@Override
+	public void updateActivities(Account account) {
+		for (Activity activity : account.getActivityWindow().getActivities()) {
+			if (activity.getId() == null) {
+				activityRepository.save(accountMapper.mapToJpaEntity(activity));
+			}
+		}
+	}
+
+}
+
+```
+
+- 데이터베이스로부터 계좌를 가져오기 위해 `AccountRepository`로 계좌를 불러온 다음 `ActivityRepository`로 해당 계좌의 특정 시간 범위 동안의 활동을 가져온다.
+- 왜 이런 수고를 해야할 까? JPA 애너테이션(`@OneToMany`를 사용해서 데이터베이스에 엔티티로 저장하면 안되는 걸까?
+  - JPA 어노테이션을 사용하면 JPA로 인해 도메인 모델을 타협해야 한다.
+  - JPA 엔티티는 기본 생성자를 필요로 한다
+  - 영속성 계층에서는 성능 측면에서 `@ManyToOne` 관계를 설정하는 것이 적절할 수 있지만 예제에서는 항상 데이터의 일부만 가져오기를 바라기 때문에 도메인 모델에서는 이 관계가 반대가 되기를 원한다.
+  - 영속성 측면과 타협없이 풍부한 도메인 모델을 생하고 싶다면 도메인 모델과 영속성 모델을 매핑하는 것이 좋다.
+
+### 데이터 베이스 트랜잭션은 어떻게 해야 할까?
+
+</br>
+
+- 트랜잭션 경계는 어디에 위치해야할까?
+  - 트랜잭션은 하나의 특정한 유스케이스에 대해서 일어나는 모든 쓰기 작업에 걸쳐 있어야 한다. 그래야 실패할 경우 다같이 롤백될 수 있기 때문이다.
+  - 영속성 어댑터는 어떤 데이터베이스 연산이 같은 유스케이스에 포함되는지 알지 못하기 때문에 언제 트랜잭션을 열고 닫을지 결정할 수 없다. 이 책임은 영속성 어댑터 호출을 관장하는 서비스에 위임해야 한다.
+
+</br>
+
+- SendMoneyService.java
+
+```java
+@Transactional
+public class SendMoneyService implements SendMoneyUseCase {
+	...
+}
+```
+
+> AspectJ같은 도구를 이용해 관점 지향 프로그래밍으로 트랜잭션 경계를 코드에 위빙할 수 있다.
+
+</br>
+
+### 유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까? - 6장
+
+</br>
+
+- 도메인 코드에 플러그인처럼 동작하는 영속성 어댑터를 만들면 도메인 코드가 영속성과 관련된 것들로부터 분리되어 풍부한 도메인 모델을 만들 수 있다.
+- 좁은 포트 인터페이스를 사용하면 포트마다 다른 방식으로 구현할 수 있는 유연함이 생긴다.
+- 포트 뒤에서 애플리케이션이 모르게 다른 영속성 기술을 사용할 수도 있다. 포트의 명세만 지켜진다면 영속성 계층 전체를 교체할 수 있다.
+
+</br>
+
 </br>
 
 ## 07. 아키텍처 요소 테스트 하기
 
 </br>
 
+### 테스트 피라미드
+
+</br>
+
+|                테스트 피라미드                 |
+| :--------------------------------------------: |
+| ![테스트 피라미드](./res/_07_test_pyramid.png) |
+
+- 비용이 많이 드는 테스트는 지양하고 비용이 적게 드는 테스트를 만들어야 한다.
+- 만드는 비용이 적고 유지보수하기 쉽고 빨리 실행되고 안정적인 작은 크기의 테스트들에 대해 높은 커버리지를 유지해야 한다. 이 테스트는 하나의 ‘단위’(일반적으로 하나의 클래스)가 제대로 동작하는지 확인할 수 있는 테스트다.
+- 테스트 피라미드는 테스트가 비싸질수록 테스트의 커버리지 목표는 낮게 잡아야 한다는 것을 보여준다.
+- `단위 테스트`, `통합 테스트`, `시스템 테스트`의 정의는 맥락에 따라 다르다.
+  - 단위 테스트는 피라미드 토대에 해당한다. 하나의 클래스를 인스턴스화하고 해당 클래스의 인터페이스를 통해 기능을 테스트한다. 의존되는 클래스들은 인스턴스화하지 않고 테스트하는 동안 목(mock)으로 대체된다.
+  - 통합테스트는 여러 유닛을 인스턴스화하고 시작점이 되는 클래스의 인터페이스로 데이터를 보낸 후 유닛들의 네트워크가 기대한대로 잘 동작하는 지 검증한다.
+  - 시스템 테스트는 애플리케이션을 구성하는 모든 객체 네트워크를 가동시켜 특정 유스케이스가 전 계층에서 잘 동작하는 지 검증
+
+</br>
+
+### 단위 테스트로 도메인 엔티티 테스트하기
+
+</br>
+
+- 단위 테스트가 도메인 엔티티에 녹아 있는 비즈니스 규칙을 검증하기 적절한 방법이다.
+
+</br>
+
+- AccountTest.java
+
+```java
+package buckpal.cleanarchitecture.account.domain;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+import static buckpal.cleanarchitecture.common.AccountTestData.*;
+import static buckpal.cleanarchitecture.common.ActivityTestData.*;
+import static org.assertj.core.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+class AccountTest {
+
+	@Test
+	void calculatesBalance() {
+		AccountId accountId = new AccountId(1L);
+		Account account = defaultAccount()
+			.withAccountId(accountId)
+			.withBaselineBalance(Money.of(555L))
+			.withActivityWindow(new ActivityWindow(
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(999L)).build(),
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(1L)).build()))
+			.build();
+
+		Money balance = account.calculateBalance();
+
+		assertThat(balance).isEqualTo(Money.of(1555L));
+	}
+
+	@Test
+	void withdrawalSucceeds() {
+		AccountId accountId = new AccountId(1L);
+		Account account = defaultAccount()
+			.withAccountId(accountId)
+			.withBaselineBalance(Money.of(555L))
+			.withActivityWindow(new ActivityWindow(
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(999L)).build(),
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(1L)).build()))
+			.build();
+
+		boolean success = account.withdraw(Money.of(555L), new AccountId(99L));
+
+		assertThat(success).isTrue();
+		assertThat(account.getActivityWindow().getActivities()).hasSize(3);
+		assertThat(account.calculateBalance()).isEqualTo(Money.of(1000L));
+	}
+
+	@Test
+	void withdrawalFailure() {
+		AccountId accountId = new AccountId(1L);
+		Account account = defaultAccount()
+			.withAccountId(accountId)
+			.withBaselineBalance(Money.of(555L))
+			.withActivityWindow(new ActivityWindow(
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(999L)).build(),
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(1L)).build()))
+			.build();
+
+		boolean success = account.withdraw(Money.of(1556L), new AccountId(99L));
+
+		assertThat(success).isFalse();
+		assertThat(account.getActivityWindow().getActivities()).hasSize(2);
+		assertThat(account.calculateBalance()).isEqualTo(Money.of(1555L));
+	}
+
+	@Test
+	void depositSuccess() {
+		AccountId accountId = new AccountId(1L);
+		Account account = defaultAccount()
+			.withAccountId(accountId)
+			.withBaselineBalance(Money.of(555L))
+			.withActivityWindow(new ActivityWindow(
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(999L)).build(),
+				defaultActivity()
+					.withTargetAccount(accountId)
+					.withMoney(Money.of(1L)).build()))
+			.build();
+
+		boolean success = account.deposit(Money.of(445L), new AccountId(99L));
+
+		assertThat(success).isTrue();
+		assertThat(account.getActivityWindow().getActivities()).hasSize(3);
+		assertThat(account.calculateBalance()).isEqualTo(Money.of(2000L));
+	}
+
+}
+```
+
+</br>
+
+### 단위 테스트로 유스케이스 테스트하기
+
+- SendMoneyServiceTest.java
+
+```java
+package buckpal.cleanarchitecture.account.application.service;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
+
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyCommand;
+import buckpal.cleanarchitecture.account.application.port.out.AccountLock;
+import buckpal.cleanarchitecture.account.application.port.out.LoadAccountPort;
+import buckpal.cleanarchitecture.account.application.port.out.UpdateAccountStatePort;
+import buckpal.cleanarchitecture.account.domain.Account;
+import buckpal.cleanarchitecture.account.domain.Money;
+
+class SendMoneyServiceTest {
+
+	private final LoadAccountPort loadAccountPort =
+		Mockito.mock(LoadAccountPort.class);
+
+	private final AccountLock accountLock =
+		Mockito.mock(AccountLock.class);
+
+	private final UpdateAccountStatePort updateAccountStatePort =
+		Mockito.mock(UpdateAccountStatePort.class);
+
+	private final SendMoneyService sendMoneyService =
+		new SendMoneyService(loadAccountPort, accountLock, updateAccountStatePort, moneyTransferProperties());
+
+	@Test
+	void givenWithdrawalFails_thenOnlySourceAccountIsLockedAndReleased() {
+
+		AccountId sourceAccountId = new AccountId(41L);
+		Account sourceAccount = givenAnAccountWithId(sourceAccountId);
+
+		AccountId targetAccountId = new AccountId(42L);
+		Account targetAccount = givenAnAccountWithId(targetAccountId);
+
+		givenWithdrawalWillFail(sourceAccount);
+		givenDepositWillSucceed(targetAccount);
+
+		SendMoneyCommand command = new SendMoneyCommand(
+			sourceAccountId,
+			targetAccountId,
+			Money.of(300L));
+
+		boolean success = sendMoneyService.sendMoney(command);
+
+		assertThat(success).isFalse();
+
+		then(accountLock).should().lockAccount(eq(sourceAccountId));
+		then(accountLock).should().releaseAccount(eq(sourceAccountId));
+		then(accountLock).should(times(0)).lockAccount(eq(targetAccountId));
+	}
+
+	@Test
+	void transactionSucceeds() {
+
+		Account sourceAccount = givenSourceAccount();
+		Account targetAccount = givenTargetAccount();
+
+		givenWithdrawalWillSucceed(sourceAccount);
+		givenDepositWillSucceed(targetAccount);
+
+		Money money = Money.of(500L);
+
+		SendMoneyCommand command = new SendMoneyCommand(
+			sourceAccount.getId().get(),
+			targetAccount.getId().get(),
+			money);
+
+		boolean success = sendMoneyService.sendMoney(command);
+
+		assertThat(success).isTrue();
+
+		AccountId sourceAccountId = sourceAccount.getId().get();
+		AccountId targetAccountId = targetAccount.getId().get();
+
+		then(accountLock).should().lockAccount(eq(sourceAccountId));
+		then(sourceAccount).should().withdraw(eq(money), eq(targetAccountId));
+		then(accountLock).should().releaseAccount(eq(sourceAccountId));
+
+		then(accountLock).should().lockAccount(eq(targetAccountId));
+		then(targetAccount).should().deposit(eq(money), eq(sourceAccountId));
+		then(accountLock).should().releaseAccount(eq(targetAccountId));
+
+		thenAccountsHaveBeenUpdated(sourceAccountId, targetAccountId);
+	}
+
+	private void thenAccountsHaveBeenUpdated(AccountId... accountIds) {
+		ArgumentCaptor<Account> accountCaptor = ArgumentCaptor.forClass(Account.class);
+		then(updateAccountStatePort).should(times(accountIds.length))
+			.updateActivities(accountCaptor.capture());
+
+		List<AccountId> updatedAccountIds = accountCaptor.getAllValues()
+			.stream()
+			.map(Account::getId)
+			.map(Optional::get)
+			.collect(Collectors.toList());
+
+		for (AccountId accountId : accountIds) {
+			assertThat(updatedAccountIds).contains(accountId);
+		}
+	}
+
+	private void givenDepositWillSucceed(Account account) {
+		given(account.deposit(any(Money.class), any(AccountId.class)))
+			.willReturn(true);
+	}
+
+	private void givenWithdrawalWillFail(Account account) {
+		given(account.withdraw(any(Money.class), any(AccountId.class)))
+			.willReturn(false);
+	}
+
+	private void givenWithdrawalWillSucceed(Account account) {
+		given(account.withdraw(any(Money.class), any(AccountId.class)))
+			.willReturn(true);
+	}
+
+	private Account givenTargetAccount() {
+		return givenAnAccountWithId(new AccountId(42L));
+	}
+
+	private Account givenSourceAccount() {
+		return givenAnAccountWithId(new AccountId(41L));
+	}
+
+	private Account givenAnAccountWithId(AccountId id) {
+		Account account = Mockito.mock(Account.class);
+		given(account.getId())
+			.willReturn(Optional.of(id));
+		given(loadAccountPort.loadAccount(eq(account.getId().get()), any(LocalDateTime.class)))
+			.willReturn(account);
+		return account;
+	}
+
+	private MoneyTransferProperties moneyTransferProperties() {
+		return new MoneyTransferProperties(Money.of(Long.MAX_VALUE));
+	}
+
+}
+```
+
+- 행동-주도 개발(behavior driven develpment)에서 일반적으로 사용되는 방식대로 given/when/then 섹션으로 나눴다.
+- `given` 섹션에서는 출금 및 입금 Account를 인스턴스를 생성하고 적절한 상태로 만든다.
+- `when` 섹션에서는 유스케이스를 실행하기 위해 메서드를 호출한다.
+- `then` 섹션에서는 유스케이스를 실행하기 위해 sendMoney 메서드를 호출한다.
+- Mockito 라이브러리를 이용해 given 메서드의 목 객체를 생성할 수 있다. 목 객체에 대해 특정 메서드가 호출됐는지 검증할 수 있는 then 메서드도 제공한다.
+- 테스트에서 어떤 상호작용을 검증하고 싶은지 신중하게 생각해야 한다. 모든 동작을 검증하는 대신 중요한 핵심만 골라 집중해서 테스트해야 한다. 클래스가 조금이라도 바뀔 때마다 테스트를 변경해야 한다. 테스트의 가치를 떨어진다.
+- 단위 테스트이지만 의존성의 상호작용을 테스트하기 때문에 통합 테스트에 가깝다. 하지만 mock으로 작업하기 때문에 통합 테스트에 비해 만들고 유지보수하기 쉽다.
+
+</br>
+
+### 통합 테스트로 웹 어댑터 테스트하기
+
+- SendMoneyControllerTest.java
+
+```java
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyCommand;
+import buckpal.cleanarchitecture.account.application.port.in.SendMoneyUseCase;
+import buckpal.cleanarchitecture.account.domain.Money;
+
+@WebMvcTest(controllers = SendMoneyController.class)
+class SendMoneyControllerTest {
+
+	@Autowired
+	private MockMvc mockMvc;
+
+	@MockBean
+	private SendMoneyUseCase sendMoneyUseCase;
+
+	@Test
+	void testSendMoney() throws Exception {
+
+		mockMvc.perform(post("/accounts/send/{sourceAccountId}/{targetAccountId}/{amount}",
+				41L, 42L, 500)
+				.header("Content-Type", "application/json"))
+			.andExpect(status().isOk());
+
+		then(sendMoneyUseCase).should()
+			.sendMoney(eq(new SendMoneyCommand(
+				new AccountId(41L),
+				new AccountId(42L),
+				Money.of(500L))));
+	}
+
+}
+```
+
+- 웹 어댑터는 JSON 문자열 형태로 HTTP를 통해 입력받고 입력에 대한 유효성 검증을하고 유스케이스에서 사용할 수 있는 포맷으로 매핑하고 유스케이스에 전달한다.
+- 유스케이스 결과를 JSON 매핑하고 HTTP 응답을 통해 클라이언트에 반환한다.
+- MockMvc 객체를 이용해 모킹했기 때문에 HTTP 프로토콜을 통해 테스트하지 않았다.
+- 하지만 프레임워크 테스트이기 때문에 잘 동작한다고 믿는다.
+- 프레임워크는 테스트할 필요가 없다.
+- 하나의 웹 컨트롤러 클래스같지만 @WebMvcTest 애너테이션은 스프링이 특정 요청 경로, 자바와 JSON 매핑, HTTP 입력 검증 등 전체 객체 네트워크를 인스턴스화하도록 만든다. 그래서 통합 테스트이다.
+- 웹 컨트롤러는 스프링 프레임워크와 강하게 묶여있어 격리된 상태로 테스트하기보다는 프레임워크와 통합된 상태로 테스트하는 것이 합리적이다.
+
+</br>
+
+### 통합 테스트로 영속성 어댑터 테스트하기
+
+</br>
+
+- 영속성 어댑터 테스트도 단위 테스트보다는 통합테스트를 적용하는 것이 합리적이다.
+
+- AccountPersistenceAdapterTest.java
+
+```java
+package buckpal.cleanarchitecture.account.adapter.out.persistence;
+
+import static buckpal.cleanarchitecture.common.AccountTestData.*;
+import static buckpal.cleanarchitecture.common.ActivityTestData.*;
+import static org.assertj.core.api.Assertions.*;
+
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.jdbc.Sql;
+
+import buckpal.cleanarchitecture.account.domain.Account;
+import buckpal.cleanarchitecture.account.domain.Account.AccountId;
+import buckpal.cleanarchitecture.account.domain.ActivityWindow;
+import buckpal.cleanarchitecture.account.domain.Money;
+
+@DataJpaTest
+@Import({AccountPersistenceAdapter.class, AccountMapper.class})
+class AccountPersistenceAdapterTest {
+
+	@Autowired
+	private AccountPersistenceAdapter adapterUnderTest;
+
+	@Autowired
+	private ActivityRepository activityRepository;
+
+	@Test
+	@Sql("AccountPersistenceAdapterTest.sql")
+	void loadsAccount() {
+		Account account = adapterUnderTest.loadAccount(new AccountId(1L), LocalDateTime.of(2018, 8, 10, 0, 0));
+
+		assertThat(account.getActivityWindow().getActivities()).hasSize(2);
+		assertThat(account.calculateBalance()).isEqualTo(Money.of(500));
+	}
+
+	@Test
+	void updatesActivities() {
+		Account account = defaultAccount()
+			.withBaselineBalance(Money.of(555L))
+			.withActivityWindow(new ActivityWindow(
+				defaultActivity()
+					.withId(null)
+					.withMoney(Money.of(1L)).build()))
+			.build();
+
+		adapterUnderTest.updateActivities(account);
+
+		assertThat(activityRepository.count()).isEqualTo(1);
+
+		ActivityJpaEntity savedActivity = activityRepository.findAll().get(0);
+		assertThat(savedActivity.getAmount()).isEqualTo(1L);
+	}
+
+}
+```
+
+- AccountPersistenceAdapterTest.sql
+
+```java
+insert into account (id) values (1);
+insert into account (id) values (2);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (1, '2018-08-08 08:00:00.0', 1, 1, 2, 500);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (2, '2018-08-08 08:00:00.0', 2, 1, 2, 500);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (3, '2018-08-09 10:00:00.0', 1, 2, 1, 1000);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (4, '2018-08-09 10:00:00.0', 2, 2, 1, 1000);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (5, '2019-08-09 09:00:00.0', 1, 1, 2, 1000);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (6, '2019-08-09 09:00:00.0', 2, 1, 2, 1000);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (7, '2019-08-09 10:00:00.0', 1, 2, 1, 1000);
+
+insert into activity (id, timestamp, owner_account_id, source_account_id, target_account_id, amount)
+values (8, '2019-08-09 10:00:00.0', 2, 2, 1, 1000);
+```
+
+- `@DataJpaTest` 애너테이션으로 데이터베이스 접근에 필요한 객체 네트워크를 인스턴스화 해야한다는 것을 스프링에게 알려준다.
+- `@Import` 애너테이션을 추가해서 특정 객체가 이 네트워크에 추가됐다는 것을 표현한다.
+- SQL 스크립트를 이용해서 데이터베이스를 특정 상태로 만든다. 그 다음 SQL 스크립트에서 설정한 상태값을 가지고 있는지 검증한다.
+- 스프링에서는 기본적으로 인메모리(in-memory) 데이터베이스를 테스트에서 사용한다.
+- 프로덕션 환경에서는 인메모리 데이터베이스를 사용하지 않는 경우가 많아 실제 데이터베이스에서 문제가 발생 할 수 있다.
+- 영속성 어댑터 테스트는 실제 데이터베이스를 대상으로 진행해야한다. Testcontainers 같은 라이브러리로 사용하여 데이터베이스를 도커 컨테이너에서 띄워서 사용한다.
+
+</br>
+
+### 시스템 테스트로 주요 경로 테스트하기
+
+</br>
+
+- SendMoneySystemTest.java
+
+```java
+package buckpal.cleanarchitecture;
+
+import static buckpal.cleanarchitecture.account.domain.Account.*;
+import static org.assertj.core.api.BDDAssertions.*;
+
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.jdbc.Sql;
+
+import buckpal.cleanarchitecture.account.application.port.out.LoadAccountPort;
+import buckpal.cleanarchitecture.account.domain.Account;
+import buckpal.cleanarchitecture.account.domain.Money;
+
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+class SendMoneySystemTest {
+
+	@Autowired
+	private TestRestTemplate restTemplate;
+
+	@Autowired
+	private LoadAccountPort loadAccountPort;
+
+	@Test
+	@Sql("SendMoneySystemTest.sql")
+	void sendMoney() {
+
+		Money initialSourceBalance = sourceAccount().calculateBalance();
+		Money initialTargetBalance = targetAccount().calculateBalance();
+
+		ResponseEntity response = whenSendMoney(
+			sourceAccountId(),
+			targetAccountId(),
+			transferredAmount());
+
+		then(response.getStatusCode())
+			.isEqualTo(HttpStatus.OK);
+
+		then(sourceAccount().calculateBalance())
+			.isEqualTo(initialSourceBalance.minus(transferredAmount()));
+
+		then(targetAccount().calculateBalance())
+			.isEqualTo(initialTargetBalance.plus(transferredAmount()));
+
+	}
+
+	private Account sourceAccount() {
+		return loadAccount(sourceAccountId());
+	}
+
+	private Account targetAccount() {
+		return loadAccount(targetAccountId());
+	}
+
+	private Account loadAccount(AccountId accountId) {
+		return loadAccountPort.loadAccount(
+			accountId,
+			LocalDateTime.now());
+	}
+
+	private ResponseEntity whenSendMoney(
+		AccountId sourceAccountId,
+		AccountId targetAccountId,
+		Money amount) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Type", "application/json");
+		HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+		return restTemplate.exchange(
+			"/accounts/send/{sourceAccountId}/{targetAccountId}/{amount}",
+			HttpMethod.POST,
+			request,
+			Object.class,
+			sourceAccountId.getValue(),
+			targetAccountId.getValue(),
+			amount.getAmount());
+	}
+
+	private Money transferredAmount() {
+		return Money.of(500L);
+	}
+
+	private Money balanceOf(AccountId accountId) {
+		Account account = loadAccountPort.loadAccount(accountId, LocalDateTime.now());
+		return account.calculateBalance();
+	}
+
+	private AccountId sourceAccountId() {
+		return new AccountId(1L);
+	}
+
+	private AccountId targetAccountId() {
+		return new AccountId(2L);
+	}
+
+}
+
+```
+
+- 피라미드 최상단의 시스템 테스트로 전체 애플리케이션을 띄우고 API를 통해 요청 보내고 모든 계층이 조화롭게 잘 동작하는지 검증한다.
+- @SpringBootTest는 애플리케이션을 구성하는 모든 객체 네트워크를 띄우게 한다. 랜덤 포트도 이 애플리케이션을 띄우도록 한다.
+- 웹 어댑터처럼 MockMvc를 이용해 요청을 보내는 것이 아니라 TestRestTemplate을 이용해서 요청을 보낸다.
+- 실제 HTTP 통신을 하는 것처럼 실제 출력 어댑터도 이용한다.
+- 시스템 테스트여도 언제나 서드파티 시스템을 실행해서 테스트할 수 있지는 않아 모킹을 해야할 때 도 있다. 육각형 아키텍처는 이런 경우 몇 개의 출력 포트 인터페이스만 모킹하면 이 문제를 해결할 수 있다.
+- 헬퍼 메서드들은 여러가지 상태를 검증할 때 사용할 수 있는 도메인 특화 언어(domain-specific language, DSL)를 형성한다.
+  - 시스템 테스트에서 유용하다. 실제 사용자를 잘 흉내내기 때문에 사용자 관점에서 애플리케이션을 검증할 수 있다.
+  - 시스템 테스트는 여러 유스케이스를 결합했을 때 빛이난다.
+
+</br>
+
+### 얼마만큼의 테스트가 충분할까?
+
+</br>
+
+- 라인 커버러지는 테스트 성공을 측정하는 데 있어서 잘못된 지표다.
+- 얼마나 마음 편하게 소프트웨어를 배포할 수 있으냐를 테스트 성공의 기준으로 잡아야한다.
+
+</br>
+
+> 우리가 만들어야 할 테스트를 정의하는 전략으로 시작하자.
+
+- 육각형 아키텍처에서 사용하는 테스트 전략
+  - 도메인 엔티티를 구현할 때는 단위 테스트로 커버하자
+  - 유스케이스를 구현할 때는 단위 테스트로 커버하자
+  - 어댑터를 구현할 때는 통합 테스트로 커버하자
+  - 사용자가 취할 수 있는 중요 애플리케이션 경로는 시스템 테스트로 커버하자
+- 리팩토링할 때마다 테스트 코드로 변경해야 한다면 테스트는 테스트로서의 가치를 잃는다.
+
+</br>
+
+### 유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까? - 7장
+
+</br>
+
+- 육각형 아키텍처는 도메인 로직과 바깥으로 향한 어댑터를 깔끔히 분리한다.
+- 도메인 로직은 단위 테스트로 어댑터는 통합 테스트로 처리하는 전략을 사용하는 것이다.
+- 입출력 포트는 테스트에서 뚜렷한 모킹 지점이 된다.
+- 포트 인터페이스가 더 적은 메서드를 제공할수록 어떤 메서드를 모킹해야할 지 덜 헷갈린다.
+
 </br>
 
 ## 08. 경계간 매핑하기
 
 </br>
+
+> 늘상 각 계층의 모델을 매핑하는 곳에서는 문제가 발생한다.
+
+- 매핑에 찬성하는 개발자
+  - 두 계층 간에 매핑을 하지 않으면 양 계층에서 같은 모델을 사용해야 하는데 이렇게 하면 두 계층이 강하게 결합됩니다.
+- 매핑에 반대하는 개발자
+  - 두 계층 간에 매핑을 하게 되면 보일러플레이트 코드를 많이 만들게 된다. 많은 유스케이스들이 오직 CRUD만 수행하고 계층에 걸쳐 같은 모델을 사용하기 때문에 계층간 매핑은 과하다.
+
+</br>
+
+### 매핑하지 않기 전략
+
+</br>
+
+|           매핑하지 않기 전략            |
+| :-------------------------------------: |
+| ![no mapping](./res/_08_no_mapping.png) |
+
+- 포트 인터페이스가 도메인 모델을 입출력 모델로 사용하면 두 계층간의 매핑할 필요가 없어진다.
+- 웹 계층과 애플리케이션에서 모두 Account를 사용해서 두 계층이 같은 모델을 사용하는것이다. 영속성 계층에서도 같은 관계다.
+  - 각 계층에서 모델에 대한 특별한 요청이 있을 수 있다.
+  - 웹계층에서는 JSON 직렬화를 위한 애너테이션을 사용해야 할 수 있다.
+  - ORM을 사용하기 위해서는 데이터베이스 매핑을 위해 특정 애너테이션이 필요할 수 있다.
+  - Account 클래스가 웹, 애플리케이션, 영속성 계층에서 사용되면 단일 책임 원칙을 위반한다.
+- 모든 계층이 정확히 같은 구조와 정보를 필요로 한다면 ‘매핑하지 않기 전략’은 완벽한 선택지이다.
+- 그러나 애플리케이션 계층, 도메인 계층에서 웹과 영속성 문제를 다루게 되면 곧바로 다른 전략을 취해야한다.
+
+</br>
+
+### 양방향 매핑 전략
+
+> 각 계층이 전용 모델을 가진 매핑 전략을 양방향 매핑 전략이라고 한다.
+
+</br>
+
+|                  양방향 매핑 전략                  |
+| :------------------------------------------------: |
+| ![양방향 매핑 전략](./res/_08_two_way_mapping.png) |
+
+> 각 어댑터가 전용 모델을 가지고 있어서 해당 모델을 도메인 모델로 도메인 모델을 해당 모델로 매핑할 책임을 가지고 있다.
+
+- 웹 계층에서는 웹 모델을 인커밍 포트에서 필요한 모델로 매핑하고 인커밍 포트에 의해 반환된 도메인 객체를 다시 웹 모델로 매핑한다.
+- 영속성 계층은 아웃고잉 포트가 사용하는 도메인 모델과 영속성 모델 간의 매핑과 유사한 매핑을 담당한다.
+- 두 계층 모두 양방향으로 매핑하기 때문에 ‘양방향’ 매핑이라고 부른다.
+- 각 계층이 전용 모델을 가지고 있어 각 계층이 전용 모델을 변경하더라도 다른 계층에는 영향이 없다.
+- 웹 모델은 데이터를 최적으로 표현할 수 있는 구조를 가지고 도메인 모델은 유스케이스를 잘 구현할 수 있는 구조를 가진다. 영속성 모델은 데이터베이스에 객체를 저장하기 위해 ORM에서 필요로 하는 구조를 가질 수 있다.
+
+</br>
+
+#### 장점
+
+</br>
+
+- 웹이나 영속성 관심사로 오염되지 않는 깨끗한 도메인 모델로 이어진다. 단일 책임 원칙을 만족한다.
+- ‘매핑하지 않기’ 전략 다음으로 간단한 전략이다.
+- 매핑 책임이 명확하다.
+- 바깥쪽 계층/어댑터는 안쪽 계층으로 매핑하고 다시 반대 방향으로 매핑한다. 안쪽 계층의 모델만 알면 되고 매핑대신 도메인 로직에 집중할 수 있다.
+
+</br>
+
+#### 단점
+
+</br>
+
+- 너무 많은 보일러플레이트 코드가 생긴다.
+- 매핑 프레임워크를 사용하더라도 시간이 많이 든다.
+  - 매핑 프레임워크가 리플렉션을 사용하는 경우 디버깅하기 힘들다.
+- 도메인 모델이 계층 경계를 넘어서 통신하는 데 사용된다.
+  - 인커밍 포트와 아웃고잉 포트는 도메인 객체를 입력 파라미터와 반환값으로 사용한다.
+  - 도메인 요구가 아닌 바깥쪽 계층의 요구에 따른 변경에 취약해진다.
+- silver bullet이 아니다.
+
+</br>
+
+### 완전 매핑 전략
+
+</br>
+
+|                완전 매핑 전략                 |
+| :-------------------------------------------: |
+| ![완전 매핑 전략](./res/_08_full_mapping.png) |
+
+> 각 연산이 전용 모델을 필요로 하기 때문에 웹 어댑터와 애플리케이션 계층 각각이 자신의 전용 모델을 각 연산을 실행하는 데 필요한 모델로 매핑한다.
+
+- 각 연산마다 별도의 입출력 모델을 사용한다. 계층 경계를 넘어 통신할 때 도메인 모델을 사용하는 대신 SendMoneyUseCase포트의 입력 모델로 동작하는 SendMoneyCommand처럼 각 작업에 특화된 모델을 사용한다.
+- 이 모델을 ‘커맨드(command)’, ‘요청(request)’ 혹은 이와 비슷한 단어로 사용한다.
+- 웹 계층은 입력을 애플리케이션 계층의 커맨드 객체로 매핑할 책임을 가지고 있다.
+  - 커맨드 객체는 애플리케이션 계층의 인터페이스를 해석할 여지 없이 명확하게 만들어준다.
+  - 각 유스케이스는 전용 필드와 유효성 검증 로직을 가진 전용 커맨드를 가진다. 어떤 필드를 채울지 어떤 필드를 비워두는 게 더 나은지 추측할 필요가 전혀 없다. 값을 비워둘 수 있는 필드를 허용할 경우 현재의 유스케이스에서는 필요없는 유효성 검증이 수행될 수도 있다.
+- 애플리케이션 계층은 커맨드 객체를 유스케이스에 따라 도메인 모델을 변경하기 위해 필요한 무언가로 매핑할 책임을 가진다.
+- 한 계층을 다른 여러 개의 커맨드로 매핑하는 데 하나의 웹 모델과 도메인 모델 간의 매핑보다 더 많은 코드가 필요하다.
+- 여러 유스케이스의 요구사항을 함께 다뤄야하는 매핑에 비해 구현하고 유지보수하기 쉽다.
+- 전역으로 사용하기보다는 웹 계층 → 애플리케이션 계층 사이의 상태 변경 유스케이스의 경계를 명확하게 할 때 빛이난다. 하지만 애플리케이션 → 영속성 사이는 매핑 오버헤드가 발생 할 수 있다.
+- 매핑 전략은 여러가지 섞어써야만 한다. 어떤 매핑 전략도 모든 계층에 전역적일 필요는 없다.
+
+</br>
+
+### 단방향 매핑 전략
+
+</br>
+
+|             단 방향 매핑 전략              |
+| :----------------------------------------: |
+| ![단방향 매핑 전략](./res/_08_one_way.png) |
+
+> 동일한 ‘상태’ 인터페이스를 구현하는 도메인 모델과 어댑터 모델을 이용하면 각 계층은 다른 계층으로부터 온 객체를 단방향으로 매핑하기만 하면 된다.
+
+- 모든 계층의 모델들이 같은 인터페이스를 공유한다.
+- 관련 있는 특성(attribute)에 대한 getter 메서드를 제공해서 도메인 모델의 상태를 캡슐화한다.
+- 도메인 객체를 바깥 계층으로 전달하고 싶으면 매핑 없이 할 수 있다. 인커밍/아웃고잉 포트가 기대하는 대로 상태 인터페이스를 구현하고 있기 때문이다.
+- 도메인 모델은 풍부한 행동을 구현할 수 있고 애플리케이션 계층 내의 서비스에서 이러한 행동에 접근할 수 있다.
+- 바깥 계층에서 상태 인터페이스를 이용할지 전용 모델로 매핑해야할지 결정할 수 있다.
+- 바깥 계층에서 애플리케이션 계층으로 전달하는 객체들도 이 상태 인터페이스를 구현하고 있다. 애플리케이션 계층에서는 이 객체를 실제 도메인 모델로 매핑해서 도메인 모델의 행동에 접근할 수 있게 된다.
+- 팩토리(factory)라는 DDD 개념과 잘 어울린다. DDD 용어인 팩토리는 어떤 특정한 상태로부터 도메인 객체를 재구성할 책임을 가지고 있다.
+- 매핑이 계층을 넘나들며 퍼져있어서 이 전략은 다른 전략에 비해 어렵다.
+- 계층 간의 모델이 비슷할 때 가장 효과적이다.
+  - 읽기 전용 연산의 경우 상테 인터페이스가 필요한 모든 정보를 제공하기 때문에 웹 계층에서 전용 모델로 매핑할 필요가 없다.
+
+</br>
+
+### 언제 어떤 매핑 전략을 사용할 것인가?
+
+</br>
+
+- 언제 어떤 전략을 사용할지 결정하려면 팀 내에서 합의할 수 있는 가이드라인을 정해둬야 한다.
+- 가이드라인 예제
+  - 변경 유스케이스를 작업하고 있다면 웹 계층과 애플리케이션 계층 사이에서는 유스케이스 간의 결합을 제거하기 위해 ‘완전 매핑’ 전략을 첫 번째 선택지로 택해야한다. 유스케이스별 유효성 검증 규칙이 명확해지고 특정 유스케이스에서 필요하지 않은 필드를 다루지 않아도 된다.
+  - 변경 유스케이스를 작업하고 있다면 애플리케이션과 영속성 계층 사이에서는 매핑 오버헤드를 줄이고 빠르게 코드를 짜기 위해서 ‘매핑하지 않기’ 전략을 첫 번째 선택지로 둔다. 하지만 애플리케이션 계층에서 영속성 문제를 다뤄야 하게 되면 ‘양방향’ 매핑 전략으로 바꿔서 영속성 문제를 영속성 계층에 가둘 수 있어야 한다.
+  - 쿼리 작업을 하면 매핑 오버헤드를 줄이고 빠르게 코드를 짜기 위해 ‘매핑하지 않기’ 전략이 웹 → 애플리케이션 → 영속성 계층 사이에서 첫 번째 선택지가 되어야한다. 하지만 애플리케이션에서 영속성 문제나 웹 문제를 다뤄야 하게 되면 ‘양방향’ 매핑 전략으로 바꾼다.
+- 팀 차원에서 지속적으로 논의하고 수정해야 한다.
+
+</br>
+
+### 유지보수 가능한 소프트웨어를 만드는데 어떻게 도움이 될까? - 8장
+
+</br>
+
+- 인커밍 포트와 아웃고잉 포트는 서로 다른 계층이 어떻게 통신해야 하는지를 정의한다.
+- 각 유스케이스에 대해 좁은 포트를 사용하면 유스케이스마다 다른 매핑전략을 사용할 수 있고 다른 유스케이스에 영향을 미치지 않으면서 코드를 개선할 수 있기 때문에 특정 상황 특정 시점에 최선의 전략을 선택할 수 있다.
 
 </br>
 

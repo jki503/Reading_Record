@@ -1,4 +1,4 @@
-package buckpal.cleanarchitecture.account.adapter;
+package buckpal.cleanarchitecture.account.adapter.in.web;
 
 import static buckpal.cleanarchitecture.account.domain.Account.*;
 
